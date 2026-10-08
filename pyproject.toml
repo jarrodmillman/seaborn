@@ -45,7 +45,7 @@ test = [
     "pytest-xdist==3.8.0",
 ]
 lint = [
-    "ruff==0.15.20",
+    "ruff==0.16.10",
 ]
 # Type checking requires Python >=3.12 to pull in scientific Python stubs
 typecheck = [

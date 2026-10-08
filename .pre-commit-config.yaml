@@ -1,21 +1,22 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
     hooks:
-    -   id: check-yaml
-    -   id: end-of-file-fixer
-    -   id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
         exclude: \.svg$
--   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: f12be1ebaa5351c1fc76472de98db2c3446c8253  # frozen: v0.16.10
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 65dbdb59d2f2d9c3bdc343c566821ad3319ddaa3 # frozen: v0.16.3
     hooks:
-    -   id: ruff
+      - id: ruff-check
         exclude: seaborn/(cm\.py|external/)
-        types: [file, python]
--   repo: https://github.com/astral-sh/ty-pre-commit
+        args: [--fix, --show-fixes, --exit-non-zero-on-fix]
+      - id: ruff-format
+  - repo: https://github.com/astral-sh/ty-pre-commit
     rev: 55b90b9b17c398bf664dd80a913668780e29a812  # frozen: v0.0.85
     hooks:
-    -   id: ty
-        # ty resolves imports from the environment; install the scientific stack
-        # plus stubs. Scope comes from [tool.ty.src] in pyproject.toml.
-        args: [--no-default-groups, --extra=stats, --group=typecheck]
+    - id: ty
+      # ty resolves imports from the environment; install the scientific stack
+      # plus stubs. Scope comes from [tool.ty.src] in pyproject.toml.
+      args: [--no-default-groups, --extra=stats, --group=typecheck]
