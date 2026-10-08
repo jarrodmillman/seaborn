@@ -1,7 +1,7 @@
-
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import ClassVar, cast
+
 try:
     from typing import Literal
 except ImportError:
@@ -53,6 +53,7 @@ class Perc(Stat):
     .. include:: ../docstrings/objects.Perc.rst
 
     """
+
     k: int | list[float] = 5
     method: str = "linear"
 
@@ -67,7 +68,11 @@ class Perc(Stat):
         return DataFrame({var: res, "percentile": k})
 
     def __call__(
-        self, data: DataFrame, groupby: GroupBy, orient: str, scales: dict[str, Scale],
+        self,
+        data: DataFrame,
+        groupby: GroupBy,
+        orient: str,
+        scales: dict[str, Scale],
     ) -> DataFrame:
 
         var = {"x": "y", "y": "x"}[orient]

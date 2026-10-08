@@ -11,7 +11,6 @@ from seaborn._marks.base import Mark, Mappable, resolve_color
 
 
 class TestMappable:
-
     def mark(self, **features):
 
         @dataclass
@@ -28,7 +27,7 @@ class TestMappable:
 
     def test_repr(self):
 
-        assert str(Mappable(.5)) == "<0.5>"
+        assert str(Mappable(0.5)) == "<0.5>"
         assert str(Mappable("CO")) == "<'CO'>"
         assert str(Mappable(rc="lines.linewidth")) == "<rc:lines.linewidth>"
         assert str(Mappable(depend="color")) == "<depend:color>"
@@ -101,7 +100,7 @@ class TestMappable:
 
     def test_color(self):
 
-        c, a = "C1", .5
+        c, a = "C1", 0.5
         m = self.mark(color=c, alpha=a)
 
         assert resolve_color(m, {}) == mpl.colors.to_rgba(c, a)
@@ -113,12 +112,14 @@ class TestMappable:
     def test_color_mapped_alpha(self):
 
         c = "r"
-        values = {"a": .2, "b": .5, "c": .8}
+        values = {"a": 0.2, "b": 0.5, "c": 0.8}
 
         m = self.mark(color=c, alpha=Mappable(1))
         scales = {"alpha": lambda s: np.array([values[s_i] for s_i in s])}
 
-        assert resolve_color(m, {"alpha": "b"}, "", scales) == mpl.colors.to_rgba(c, .5)
+        assert resolve_color(m, {"alpha": "b"}, "", scales) == mpl.colors.to_rgba(
+            c, 0.5
+        )
 
         df = pd.DataFrame({"alpha": list(values.keys())})
 
@@ -140,11 +141,13 @@ class TestMappable:
 
     def test_fillcolor(self):
 
-        c, a = "green", .8
-        fa = .2
+        c, a = "green", 0.8
+        fa = 0.2
         m = self.mark(
-            color=c, alpha=a,
-            fillcolor=Mappable(depend="color"), fillalpha=Mappable(fa),
+            color=c,
+            alpha=a,
+            fillcolor=Mappable(depend="color"),
+            fillalpha=Mappable(fa),
         )
 
         assert resolve_color(m, {}) == mpl.colors.to_rgba(c, a)

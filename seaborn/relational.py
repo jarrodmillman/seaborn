@@ -26,10 +26,10 @@ from ._docstrings import DocstringComponents, _core_docs
 __all__ = ["relplot", "scatterplot", "lineplot"]
 
 
-_relational_narrative = DocstringComponents(dict(
-
-    # ---  Introductory prose
-    main_api="""
+_relational_narrative = DocstringComponents(
+    dict(
+        # ---  Introductory prose
+        main_api="""
 The relationship between `x` and `y` can be shown for different subsets
 of the data using the `hue`, `size`, and `style` parameters. These
 parameters control what visual semantics are used to identify the different
@@ -41,8 +41,7 @@ graphics more accessible.
 
 See the :ref:`tutorial <relational_tutorial>` for more information.
     """,
-
-    relational_semantic="""
+        relational_semantic="""
 The default treatment of the `hue` (and to a lesser extent, `size`)
 semantic, if present, depends on whether the variable is inferred to
 represent "numeric" or "categorical" data. In particular, numeric variables
@@ -51,10 +50,10 @@ entries show regular "ticks" with values that may or may not exist in the
 data. This behavior can be controlled through various parameters, as
 described and illustrated below.
     """,
-))
+    )
+)
 
 _relational_docs = dict(
-
     # --- Shared function parameters
     data_vars="""
 x, y : names of variables in `data` or vector data
@@ -173,7 +172,6 @@ ax : matplotlib Axes
 ax : matplotlib Axes
     Returns the Axes object with the plot drawn onto it.
     """,
-
 )
 
 
@@ -186,9 +184,11 @@ _param_docs = DocstringComponents.from_nested_components(
 
 
 class _RelationalPlotter(VectorPlotter):
-
     wide_structure = {
-        "x": "@index", "y": "@values", "hue": "@columns", "style": "@columns",
+        "x": "@index",
+        "y": "@values",
+        "hue": "@columns",
+        "style": "@columns",
     }
 
     # TODO where best to define default parameters?
@@ -196,22 +196,28 @@ class _RelationalPlotter(VectorPlotter):
 
 
 class _LinePlotter(_RelationalPlotter):
-
     _legend_attributes = ["color", "linewidth", "marker", "dashes"]
 
     def __init__(
-        self, *,
-        data=None, variables={},
-        estimator=None, n_boot=None, seed=None, errorbar=None,
-        sort=True, orient="x", err_style=None, err_kws=None, legend=None
+        self,
+        *,
+        data=None,
+        variables={},
+        estimator=None,
+        n_boot=None,
+        seed=None,
+        errorbar=None,
+        sort=True,
+        orient="x",
+        err_style=None,
+        err_kws=None,
+        legend=None,
     ):
 
         # TODO this is messy, we want the mapping to be agnostic about
         # the kind of plot to draw, but for the time being we need to set
         # this information so the SizeMapping can use it
-        self._default_size_range = (
-            np.r_[.5, 2] * mpl.rcParams["lines.linewidth"]
-        )
+        self._default_size_range = np.r_[0.5, 2] * mpl.rcParams["lines.linewidth"]
 
         super().__init__(data=data, variables=variables)
 
@@ -245,7 +251,7 @@ class _LinePlotter(_RelationalPlotter):
         # Set default error kwargs
         err_kws = self.err_kws.copy()
         if self.err_style == "band":
-            err_kws.setdefault("alpha", .2)
+            err_kws.setdefault("alpha", 0.2)
         elif self.err_style == "bars":
             pass
         elif self.err_style is not None:
@@ -255,7 +261,10 @@ class _LinePlotter(_RelationalPlotter):
         # Initialize the aggregation object
         weighted = "weight" in self.plot_data
         agg = (WeightedAggregator if weighted else EstimateAggregator)(
-            self.estimator, self.errorbar, n_boot=self.n_boot, seed=self.seed,
+            self.estimator,
+            self.errorbar,
+            n_boot=self.n_boot,
+            seed=self.seed,
         )
 
         # TODO abstract variable to aggregate over here-ish. Better name?
@@ -274,16 +283,12 @@ class _LinePlotter(_RelationalPlotter):
         # Loop over the semantic subsets and add to the plot
         grouping_vars = "hue", "size", "style"
         for sub_vars, sub_data in self.iter_data(grouping_vars, from_comp_data=True):
-
             if self.sort:
                 sort_vars = ["units", orient, other]
                 sort_cols = [var for var in sort_vars if var in self.variables]
                 sub_data = sub_data.sort_values(sort_cols)
 
-            if (
-                self.estimator is not None
-                and sub_data[orient].value_counts().max() > 1
-            ):
+            if self.estimator is not None and sub_data[orient].value_counts().max() > 1:
                 if "units" in self.variables:
                     # TODO eventually relax this constraint
                     err = "estimator must be None when specifying units"
@@ -291,11 +296,9 @@ class _LinePlotter(_RelationalPlotter):
                 grouped = sub_data.groupby(orient, sort=self.sort)
                 # Could pass as_index=False instead of reset_index,
                 # but that fails on a corner case with older pandas.
-                sub_data = (
-                    grouped
-                    .apply(agg, other, **groupby_apply_include_groups(False))
-                    .reset_index()
-                )
+                sub_data = grouped.apply(
+                    agg, other, **groupby_apply_include_groups(False)
+                ).reset_index()
             else:
                 sub_data[f"{other}min"] = np.nan
                 sub_data[f"{other}max"] = np.nan
@@ -308,7 +311,7 @@ class _LinePlotter(_RelationalPlotter):
 
             # --- Draw the main line(s)
 
-            if "units" in self.variables:   # XXX why not add to grouping variables?
+            if "units" in self.variables:  # XXX why not add to grouping variables?
                 lines = []
                 for _, unit_data in sub_data.groupby("units"):
                     lines.extend(ax.plot(unit_data["x"], unit_data["y"], **kws))
@@ -316,7 +319,6 @@ class _LinePlotter(_RelationalPlotter):
                 lines = ax.plot(sub_data["x"], sub_data["y"], **kws)
 
             for line in lines:
-
                 if "hue" in sub_vars:
                     line.set_color(self._hue_map(sub_vars["hue"]))
 
@@ -337,20 +339,19 @@ class _LinePlotter(_RelationalPlotter):
             # --- Draw the confidence intervals
 
             if self.estimator is not None and self.errorbar is not None:
-
                 # TODO handling of orientation will need to happen here
 
                 if self.err_style == "band":
-
                     func = {"x": ax.fill_between, "y": ax.fill_betweenx}[orient]
                     func(
                         sub_data[orient],
-                        sub_data[f"{other}min"], sub_data[f"{other}max"],
-                        color=line_color, **err_kws
+                        sub_data[f"{other}min"],
+                        sub_data[f"{other}max"],
+                        color=line_color,
+                        **err_kws,
                     )
 
                 elif self.err_style == "bars":
-
                     error_param = {
                         f"{other}err": (
                             sub_data[other] - sub_data[f"{other}min"],
@@ -358,9 +359,13 @@ class _LinePlotter(_RelationalPlotter):
                         )
                     }
                     ebars = ax.errorbar(
-                        sub_data["x"], sub_data["y"], **error_param,
-                        linestyle="", color=line_color, alpha=line_alpha,
-                        **err_kws
+                        sub_data["x"],
+                        sub_data["y"],
+                        **error_param,
+                        linestyle="",
+                        color=line_color,
+                        alpha=line_alpha,
+                        **err_kws,
                     )
 
                     # Set the capstyle properly on the error bars
@@ -381,7 +386,6 @@ class _LinePlotter(_RelationalPlotter):
 
 
 class _ScatterPlotter(_RelationalPlotter):
-
     _legend_attributes = ["color", "s", "marker"]
 
     def __init__(self, *, data=None, variables={}, legend=None):
@@ -389,8 +393,8 @@ class _ScatterPlotter(_RelationalPlotter):
         # TODO this is messy, we want the mapping to be agnostic about
         # the kind of plot to draw, but for the time being we need to set
         # this information so the SizeMapping can use it
-        self._default_size_range = (
-            np.r_[.5, 2] * np.square(mpl.rcParams["lines.markersize"])
+        self._default_size_range = np.r_[0.5, 2] * np.square(
+            mpl.rcParams["lines.markersize"]
         )
 
         super().__init__(data=data, variables=variables)
@@ -453,7 +457,7 @@ class _ScatterPlotter(_RelationalPlotter):
 
         if "linewidth" not in kws:
             sizes = points.get_sizes()
-            linewidth = .08 * np.sqrt(np.percentile(sizes, 10))
+            linewidth = 0.08 * np.sqrt(np.percentile(sizes, 10))
             points.set_linewidths(linewidth)
             kws["linewidth"] = linewidth
 
@@ -469,14 +473,36 @@ class _ScatterPlotter(_RelationalPlotter):
 
 
 def lineplot(
-    data=None, *,
-    x=None, y=None, hue=None, size=None, style=None, units=None, weights=None,
-    palette=None, hue_order=None, hue_norm=None,
-    sizes=None, size_order=None, size_norm=None,
-    dashes=True, markers=None, style_order=None,
-    estimator="mean", errorbar=("ci", 95), n_boot=1000, seed=None,
-    orient="x", sort=True, err_style="band", err_kws=None,
-    legend="auto", ci="deprecated", ax=None, **kwargs
+    data=None,
+    *,
+    x=None,
+    y=None,
+    hue=None,
+    size=None,
+    style=None,
+    units=None,
+    weights=None,
+    palette=None,
+    hue_order=None,
+    hue_norm=None,
+    sizes=None,
+    size_order=None,
+    size_norm=None,
+    dashes=True,
+    markers=None,
+    style_order=None,
+    estimator="mean",
+    errorbar=("ci", 95),
+    n_boot=1000,
+    seed=None,
+    orient="x",
+    sort=True,
+    err_style="band",
+    err_kws=None,
+    legend="auto",
+    ci="deprecated",
+    ax=None,
+    **kwargs,
 ):
 
     # Handle deprecation of ci parameter
@@ -487,8 +513,14 @@ def lineplot(
         variables=dict(
             x=x, y=y, hue=hue, size=size, style=style, units=units, weight=weights
         ),
-        estimator=estimator, n_boot=n_boot, seed=seed, errorbar=errorbar,
-        sort=sort, orient=orient, err_style=err_style, err_kws=err_kws,
+        estimator=estimator,
+        n_boot=n_boot,
+        seed=seed,
+        errorbar=errorbar,
+        sort=sort,
+        orient=orient,
+        err_style=err_style,
+        err_kws=err_kws,
         legend=legend,
     )
 
@@ -604,18 +636,30 @@ Examples
 
 
 def scatterplot(
-    data=None, *,
-    x=None, y=None, hue=None, size=None, style=None,
-    palette=None, hue_order=None, hue_norm=None,
-    sizes=None, size_order=None, size_norm=None,
-    markers=True, style_order=None, legend="auto", ax=None,
-    **kwargs
+    data=None,
+    *,
+    x=None,
+    y=None,
+    hue=None,
+    size=None,
+    style=None,
+    palette=None,
+    hue_order=None,
+    hue_norm=None,
+    sizes=None,
+    size_order=None,
+    size_norm=None,
+    markers=True,
+    style_order=None,
+    legend="auto",
+    ax=None,
+    **kwargs,
 ):
 
     p = _ScatterPlotter(
         data=data,
         variables=dict(x=x, y=y, hue=hue, size=size, style=style),
-        legend=legend
+        legend=legend,
     )
 
     p.map_hue(palette=palette, order=hue_order, norm=hue_norm)
@@ -698,24 +742,43 @@ Examples
 
 
 def relplot(
-    data=None, *,
-    x=None, y=None, hue=None, size=None, style=None, units=None, weights=None,
-    row=None, col=None, col_wrap=None, row_order=None, col_order=None,
-    palette=None, hue_order=None, hue_norm=None,
-    sizes=None, size_order=None, size_norm=None,
-    markers=None, dashes=None, style_order=None,
-    legend="auto", kind="scatter", height=5, aspect=1, facet_kws=None,
-    **kwargs
+    data=None,
+    *,
+    x=None,
+    y=None,
+    hue=None,
+    size=None,
+    style=None,
+    units=None,
+    weights=None,
+    row=None,
+    col=None,
+    col_wrap=None,
+    row_order=None,
+    col_order=None,
+    palette=None,
+    hue_order=None,
+    hue_norm=None,
+    sizes=None,
+    size_order=None,
+    size_norm=None,
+    markers=None,
+    dashes=None,
+    style_order=None,
+    legend="auto",
+    kind="scatter",
+    height=5,
+    aspect=1,
+    facet_kws=None,
+    **kwargs,
 ):
 
     if kind == "scatter":
-
         Plotter = _ScatterPlotter
         func = scatterplot
         markers = True if markers is None else markers
 
     elif kind == "line":
-
         Plotter = _LinePlotter
         func = lineplot
         dashes = True if dashes is None else dashes
@@ -786,9 +849,15 @@ def relplot(
 
     # Define the common plotting parameters
     plot_kws = dict(
-        palette=palette, hue_order=hue_order, hue_norm=hue_norm,
-        sizes=sizes, size_order=size_order, size_norm=size_norm,
-        markers=markers, dashes=dashes, style_order=style_order,
+        palette=palette,
+        hue_order=hue_order,
+        hue_norm=hue_norm,
+        sizes=sizes,
+        size_order=size_order,
+        size_norm=size_norm,
+        markers=markers,
+        dashes=dashes,
+        style_order=style_order,
         legend=False,
     )
     plot_kws.update(kwargs)
@@ -797,7 +866,13 @@ def relplot(
 
     # Add the grid semantics onto the plotter
     grid_variables = dict(
-        x=x, y=y, row=row, col=col, hue=hue, size=size, style=style,
+        x=x,
+        y=y,
+        row=row,
+        col=col,
+        hue=hue,
+        size=size,
+        style=style,
     )
     if kind == "line":
         grid_variables.update(units=units, weights=weights)
@@ -829,9 +904,13 @@ def relplot(
     g = FacetGrid(
         data=full_data.dropna(axis=1, how="all"),
         **grid_kws,
-        col_wrap=col_wrap, row_order=row_order, col_order=col_order,
-        height=height, aspect=aspect, dropna=False,
-        **facet_kws
+        col_wrap=col_wrap,
+        row_order=row_order,
+        col_order=col_order,
+        height=height,
+        aspect=aspect,
+        dropna=False,
+        **facet_kws,
     )
 
     # Draw the plot
@@ -858,11 +937,16 @@ def relplot(
         else:
             legend_artist = partial(mpl.lines.Line2D, xdata=[], ydata=[])
             keys += [
-                "markersize", "ms",
-                "markeredgewidth", "mew",
-                "markeredgecolor", "mec",
-                "linestyle", "ls",
-                "linewidth", "lw",
+                "markersize",
+                "ms",
+                "markeredgewidth",
+                "mew",
+                "markeredgecolor",
+                "mec",
+                "linestyle",
+                "ls",
+                "linewidth",
+                "lw",
             ]
 
         common_kws = {k: v for k, v in kwargs.items() if k in keys}
@@ -873,16 +957,16 @@ def relplot(
             attrs["size"] = "linewidth"
         p.add_legend_data(g.axes.flat[0], legend_artist, common_kws, attrs)
         if p.legend_data:
-            g.add_legend(legend_data=p.legend_data,
-                         label_order=p.legend_order,
-                         title=p.legend_title,
-                         adjust_subtitles=True)
+            g.add_legend(
+                legend_data=p.legend_data,
+                label_order=p.legend_order,
+                title=p.legend_title,
+                adjust_subtitles=True,
+            )
 
     # Rename the columns of the FacetGrid's `data` attribute
     # to match the original column names
-    orig_cols = {
-        f"_{k}": f"_{k}_" if v is None else v for k, v in variables.items()
-    }
+    orig_cols = {f"_{k}": f"_{k}_" if v is None else v for k, v in variables.items()}
     grid_data = g.data.rename(columns=orig_cols)
     if data is not None and (x is not None or y is not None):
         if not isinstance(data, pd.DataFrame):

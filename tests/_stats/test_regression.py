@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 
@@ -11,17 +10,18 @@ from seaborn._stats.regression import PolyFit
 
 
 class TestPolyFit:
-
     @pytest.fixture
     def df(self, rng):
 
         n = 100
-        return pd.DataFrame(dict(
-            x=rng.normal(0, 1, n),
-            y=rng.normal(0, 1, n),
-            color=rng.choice(["a", "b", "c"], n),
-            group=rng.choice(["x", "y"], n),
-        ))
+        return pd.DataFrame(
+            dict(
+                x=rng.normal(0, 1, n),
+                y=rng.normal(0, 1, n),
+                color=rng.choice(["a", "b", "c"], n),
+                group=rng.choice(["x", "y"], n),
+            )
+        )
 
     def test_no_grouper(self, df):
 

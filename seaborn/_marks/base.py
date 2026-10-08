@@ -110,7 +110,8 @@ class Mark:
     @property
     def _mappable_props(self):
         return {
-            f.name: getattr(self, f.name) for f in fields(self)
+            f.name: getattr(self, f.name)
+            for f in fields(self)
             if isinstance(f.default, Mappable)
         }
 
@@ -119,7 +120,8 @@ class Mark:
         # TODO does it make sense to have variation within a Mark's
         # properties about whether they are grouping?
         return [
-            f.name for f in fields(self)
+            f.name
+            for f in fields(self)
             if isinstance(f.default, Mappable) and f.default.grouping
         ]
 
@@ -223,7 +225,10 @@ class Mark:
         raise NotImplementedError()
 
     def _legend_artist(
-        self, variables: list[str], value: Any, scales: dict[str, Scale],
+        self,
+        variables: list[str],
+        value: Any,
+        scales: dict[str, Scale],
     ) -> Artist | None:
 
         return None
@@ -233,9 +238,7 @@ def resolve_properties(
     mark: Mark, data: DataFrame, scales: dict[str, Scale]
 ) -> dict[str, Any]:
 
-    props = {
-        name: mark._resolve(data, name, scales) for name in mark._mappable_props
-    }
+    props = {name: mark._resolve(data, name, scales) for name in mark._mappable_props}
     return props
 
 
@@ -303,15 +306,19 @@ def document_properties(mark):
         "    This mark defines the following properties:",
         textwrap.fill(
             ", ".join([f"|{p}|" for p in properties]),
-            width=78, initial_indent=" " * 8, subsequent_indent=" " * 8,
+            width=78,
+            initial_indent=" " * 8,
+            subsequent_indent=" " * 8,
         ),
     ]
 
     docstring_lines = mark.__doc__.split("\n")
-    new_docstring = "\n".join([
-        *docstring_lines[:2],
-        *text,
-        *docstring_lines[2:],
-    ])
+    new_docstring = "\n".join(
+        [
+            *docstring_lines[:2],
+            *text,
+            *docstring_lines[2:],
+        ]
+    )
     mark.__doc__ = new_docstring
     return mark

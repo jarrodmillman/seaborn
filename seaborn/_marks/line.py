@@ -33,6 +33,7 @@ class Path(Mark):
     .. include:: ../docstrings/objects.Path.rst
 
     """
+
     color: MappableColor = Mappable("C0")
     alpha: MappableFloat = Mappable(1)
     linewidth: MappableFloat = Mappable(rc="lines.linewidth")
@@ -48,7 +49,6 @@ class Path(Mark):
     def _plot(self, split_gen, scales, orient):
 
         for keys, data, ax in split_gen(keep_na=not self._sort):
-
             vals = resolve_properties(self, keys, scales)
             vals["color"] = resolve_color(self, keys, scales=scales)
             vals["fillcolor"] = resolve_color(self, keys, prefix="fill", scales=scales)
@@ -87,7 +87,8 @@ class Path(Mark):
         self._handle_capstyle(artist_kws, vals)
 
         return mpl.lines.Line2D(
-            [], [],
+            [],
+            [],
             color=vals["color"],
             linewidth=vals["linewidth"],
             linestyle=vals["linestyle"],
@@ -124,6 +125,7 @@ class Line(Path):
     .. include:: ../docstrings/objects.Line.rst
 
     """
+
     _sort: ClassVar[bool] = True
 
 
@@ -142,6 +144,7 @@ class Paths(Mark):
     .. include:: ../docstrings/objects.Paths.rst
 
     """
+
     color: MappableColor = Mappable("C0")
     alpha: MappableFloat = Mappable(1)
     linewidth: MappableFloat = Mappable(rc="lines.linewidth")
@@ -161,7 +164,6 @@ class Paths(Mark):
 
         line_data = {}
         for keys, data, ax in split_gen(keep_na=not self._sort):
-
             if ax not in line_data:
                 line_data[ax] = {
                     "segments": [],
@@ -200,7 +202,8 @@ class Paths(Mark):
         artist_kws["dash_capstyle"] = capstyle
 
         return mpl.lines.Line2D(
-            [], [],
+            [],
+            [],
             color=key["color"],
             linewidth=key["linewidth"],
             linestyle=key["linestyle"],
@@ -233,6 +236,7 @@ class Lines(Paths):
     .. include:: ../docstrings/objects.Lines.rst
 
     """
+
     _sort: ClassVar[bool] = True
 
 
@@ -247,6 +251,7 @@ class Range(Paths):
     .. include:: ../docstrings/objects.Range.rst
 
     """
+
     def _setup_segments(self, data, orient):
 
         # TODO better checks on what variables we have
@@ -273,7 +278,8 @@ class Dash(Paths):
     .. include:: ../docstrings/objects.Dash.rst
 
     """
-    width: MappableFloat = Mappable(.8, grouping=False)
+
+    width: MappableFloat = Mappable(0.8, grouping=False)
 
     def _setup_segments(self, data, orient):
 

@@ -4,6 +4,7 @@ Sphinx plugin to run example scripts and create a gallery page.
 Lightly modified from the mpld3 project.
 
 """
+
 import os
 import os.path as op
 import re
@@ -14,14 +15,15 @@ import shutil
 import warnings
 
 import matplotlib
-matplotlib.use('Agg')
+
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 
 # Python 3 has no execfile
 def execfile(filename, globals=None, locals=None):
     with open(filename, "rb") as fp:
-        exec(compile(fp.read(), filename, 'exec'), globals, locals)
+        exec(compile(fp.read(), filename, "exec"), globals, locals)
 
 
 RST_TEMPLATE = """
@@ -125,15 +127,15 @@ Example gallery
 """
 
 
-def create_thumbnail(infile, thumbfile,
-                     width=275, height=275,
-                     cx=0.5, cy=0.5, border=4):
+def create_thumbnail(
+    infile, thumbfile, width=275, height=275, cx=0.5, cy=0.5, border=4
+):
     baseout, extout = op.splitext(thumbfile)
 
     im = matplotlib.image.imread(infile)
     rows, cols = im.shape[:2]
-    x0 = int(cx * cols - .5 * width)
-    y0 = int(cy * rows - .5 * height)
+    x0 = int(cx * cols - 0.5 * width)
+    y0 = int(cy * rows - 0.5 * height)
     xslice = slice(x0, x0 + width)
     yslice = slice(y0, y0 + height)
     thumb = im[yslice, xslice]
@@ -143,30 +145,27 @@ def create_thumbnail(infile, thumbfile,
     dpi = 100
     fig = plt.figure(figsize=(width / dpi, height / dpi), dpi=dpi)
 
-    ax = fig.add_axes([0, 0, 1, 1], aspect='auto',
-                      frameon=False, xticks=[], yticks=[])
+    ax = fig.add_axes([0, 0, 1, 1], aspect="auto", frameon=False, xticks=[], yticks=[])
     if all(thumb.shape):
-        ax.imshow(thumb, aspect='auto', resample=True,
-                  interpolation='bilinear')
+        ax.imshow(thumb, aspect="auto", resample=True, interpolation="bilinear")
     else:
-        warnings.warn(
-            f"Bad thumbnail crop. {thumbfile} will be empty."
-        )
+        warnings.warn(f"Bad thumbnail crop. {thumbfile} will be empty.")
     fig.savefig(thumbfile, dpi=dpi)
     return fig
 
 
 def indent(s, N=4):
     """indent a string"""
-    return s.replace('\n', '\n' + N * ' ')
+    return s.replace("\n", "\n" + N * " ")
 
 
 class ExampleGenerator:
     """Tools for generating an example page from a file"""
+
     def __init__(self, filename, target_dir):
         self.filename = filename
         self.target_dir = target_dir
-        self.thumbloc = .5, .5
+        self.thumbloc = 0.5, 0.5
         self.extract_docstring()
         with open(filename) as fid:
             self.filetext = fid.read()
@@ -195,7 +194,7 @@ class ExampleGenerator:
 
     @property
     def pyfilename(self):
-        return self.modulename + '.py'
+        return self.modulename + ".py"
 
     @property
     def rstfilename(self):
@@ -203,16 +202,16 @@ class ExampleGenerator:
 
     @property
     def htmlfilename(self):
-        return self.modulename + '.html'
+        return self.modulename + ".html"
 
     @property
     def pngfilename(self):
-        pngfile = self.modulename + '.png'
+        pngfile = self.modulename + ".png"
         return "_images/" + pngfile
 
     @property
     def thumbfilename(self):
-        pngfile = self.modulename + '_thumb.png'
+        pngfile = self.modulename + "_thumb.png"
         return pngfile
 
     @property
@@ -221,7 +220,7 @@ class ExampleGenerator:
 
     @property
     def pagetitle(self):
-        return self.docstring.strip().split('\n')[0].strip()
+        return self.docstring.strip().split("\n")[0].strip()
 
     @property
     def plotfunc(self):
@@ -250,29 +249,28 @@ class ExampleGenerator:
         return ", ".join(refs)
 
     def extract_docstring(self):
-        """ Extract a module-level docstring
-        """
+        """Extract a module-level docstring"""
         lines = open(self.filename).readlines()
         start_row = 0
-        if lines[0].startswith('#!'):
+        if lines[0].startswith("#!"):
             lines.pop(0)
             start_row = 1
 
-        docstring = ''
-        first_par = ''
+        docstring = ""
+        first_par = ""
         line_iter = lines.__iter__()
         tokens = tokenize.generate_tokens(lambda: next(line_iter))
         for tok_type, tok_content, _, (erow, _), _ in tokens:
             tok_type = token.tok_name[tok_type]
-            if tok_type in ('NEWLINE', 'COMMENT', 'NL', 'INDENT', 'DEDENT'):
+            if tok_type in ("NEWLINE", "COMMENT", "NL", "INDENT", "DEDENT"):
                 continue
-            elif tok_type == 'STRING':
+            elif tok_type == "STRING":
                 docstring = eval(tok_content)
                 # If the docstring is formatted with several paragraphs,
                 # extract the first one:
-                paragraphs = '\n'.join(line.rstrip()
-                                       for line in docstring.split('\n')
-                                       ).split('\n\n')
+                paragraphs = "\n".join(
+                    line.rstrip() for line in docstring.split("\n")
+                ).split("\n\n")
                 if len(paragraphs) > 0:
                     first_par = paragraphs[0]
             break
@@ -285,8 +283,9 @@ class ExampleGenerator:
                 break
         if thumbloc is not None:
             self.thumbloc = thumbloc
-            docstring = "\n".join([l for l in docstring.split("\n")
-                                   if not l.startswith("_thumb")])
+            docstring = "\n".join(
+                [l for l in docstring.split("\n") if not l.startswith("_thumb")]
+            )
 
         self.docstring = docstring
         self.short_desc = first_par
@@ -295,9 +294,8 @@ class ExampleGenerator:
     def exec_file(self):
         print(f"running {self.filename}")
 
-        plt.close('all')
-        my_globals = {'pl': plt,
-                      'plt': plt}
+        plt.close("all")
+        my_globals = {"pl": plt, "plt": plt}
         execfile(self.filename, my_globals)
 
         fig = plt.gcf()
@@ -314,27 +312,27 @@ class ExampleGenerator:
         return f"   ./{op.splitext(self.htmlfilename)[0]}\n\n"
 
     def contents_entry(self):
-        return (".. raw:: html\n\n"
-                "    <div class='thumb align-center'>\n"
-                "    <a href=./{}>\n"
-                "    <img src=../_static/{}>\n"
-                "    <span class='thumb-label'>\n"
-                "    <p>{}</p>\n"
-                "    </span>\n"
-                "    </a>\n"
-                "    </div>\n\n"
-                "\n\n"
-                "".format(self.htmlfilename,
-                          self.thumbfilename,
-                          self.plotfunc))
+        return (
+            ".. raw:: html\n\n"
+            "    <div class='thumb align-center'>\n"
+            "    <a href=./{}>\n"
+            "    <img src=../_static/{}>\n"
+            "    <span class='thumb-label'>\n"
+            "    <p>{}</p>\n"
+            "    </span>\n"
+            "    </a>\n"
+            "    </div>\n\n"
+            "\n\n"
+            "".format(self.htmlfilename, self.thumbfilename, self.plotfunc)
+        )
 
 
 def main(app):
-    static_dir = op.join(app.builder.srcdir, '_static')
-    target_dir = op.join(app.builder.srcdir, 'examples')
-    image_dir = op.join(app.builder.srcdir, 'examples/_images')
+    static_dir = op.join(app.builder.srcdir, "_static")
+    target_dir = op.join(app.builder.srcdir, "examples")
+    image_dir = op.join(app.builder.srcdir, "examples/_images")
     thumb_dir = op.join(app.builder.srcdir, "example_thumbs")
-    source_dir = op.abspath(op.join(app.builder.srcdir, '..', 'examples'))
+    source_dir = op.abspath(op.join(app.builder.srcdir, "..", "examples"))
     if not op.exists(static_dir):
         os.makedirs(static_dir)
 
@@ -352,27 +350,30 @@ def main(app):
 
     banner_data = []
 
-    toctree = ("\n\n"
-               ".. toctree::\n"
-               "   :hidden:\n\n")
+    toctree = "\n\n.. toctree::\n   :hidden:\n\n"
     contents = "\n\n"
 
     # Write individual example files
     for filename in sorted(glob.glob(op.join(source_dir, "*.py"))):
-
         ex = ExampleGenerator(filename, target_dir)
 
-        banner_data.append({"title": ex.pagetitle,
-                            "url": op.join('examples', ex.htmlfilename),
-                            "thumb": op.join(ex.thumbfilename)})
+        banner_data.append(
+            {
+                "title": ex.pagetitle,
+                "url": op.join("examples", ex.htmlfilename),
+                "thumb": op.join(ex.thumbfilename),
+            }
+        )
         shutil.copyfile(filename, op.join(target_dir, ex.pyfilename))
-        output = RST_TEMPLATE.format(sphinx_tag=ex.sphinxtag,
-                                     docstring=ex.docstring,
-                                     end_line=ex.end_line,
-                                     components=ex.components,
-                                     fname=ex.pyfilename,
-                                     img_file=ex.pngfilename)
-        with open(op.join(target_dir, ex.rstfilename), 'w') as f:
+        output = RST_TEMPLATE.format(
+            sphinx_tag=ex.sphinxtag,
+            docstring=ex.docstring,
+            end_line=ex.end_line,
+            components=ex.components,
+            fname=ex.pyfilename,
+            img_file=ex.pngfilename,
+        )
+        with open(op.join(target_dir, ex.rstfilename), "w") as f:
             f.write(output)
 
         toctree += ex.toctree_entry()
@@ -382,15 +383,17 @@ def main(app):
         banner_data = (4 * banner_data)[:10]
 
     # write index file
-    index_file = op.join(target_dir, 'index.rst')
-    with open(index_file, 'w') as index:
-        index.write(INDEX_TEMPLATE.format(sphinx_tag="example_gallery",
-                                          toctree=toctree,
-                                          contents=contents))
+    index_file = op.join(target_dir, "index.rst")
+    with open(index_file, "w") as index:
+        index.write(
+            INDEX_TEMPLATE.format(
+                sphinx_tag="example_gallery", toctree=toctree, contents=contents
+            )
+        )
 
 
 def setup(app):
-    app.connect('builder-inited', main)
+    app.connect("builder-inited", main)
     # All work happens once in the builder-inited callback, with no per-document
     # state, so reading and writing are both safe to parallelize.
     return {"parallel_read_safe": True, "parallel_write_safe": True}

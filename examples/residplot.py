@@ -3,8 +3,10 @@ Plotting model residuals
 ========================
 
 """
+
 import numpy as np
 import seaborn as sns
+
 sns.set_theme(style="whitegrid")
 
 # Make an example dataset with y ~ x

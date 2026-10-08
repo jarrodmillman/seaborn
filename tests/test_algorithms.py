@@ -77,6 +77,7 @@ def test_bootstrap_seed(random):
 
 def test_bootstrap_ols(random):
     """Test bootstrap of OLS model fit."""
+
     def ols_fit(X, y):
         XtXinv = np.linalg.inv(np.dot(X.T, X))
         return XtXinv.dot(X.T).dot(y)
@@ -87,12 +88,8 @@ def test_bootstrap_ols(random):
     y_lownoise = np.dot(X, w) + np.random.randn(50)
 
     n_boot = 500
-    w_boot_noisy = algo.bootstrap(X, y_noisy,
-                                  n_boot=n_boot,
-                                  func=ols_fit)
-    w_boot_lownoise = algo.bootstrap(X, y_lownoise,
-                                     n_boot=n_boot,
-                                     func=ols_fit)
+    w_boot_noisy = algo.bootstrap(X, y_noisy, n_boot=n_boot, func=ols_fit)
+    w_boot_lownoise = algo.bootstrap(X, y_lownoise, n_boot=n_boot, func=ols_fit)
 
     assert w_boot_noisy.shape == (n_boot, 5)
     assert w_boot_lownoise.shape == (n_boot, 5)

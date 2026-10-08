@@ -7,7 +7,6 @@ from seaborn._core.subplots import Subplots
 
 
 class TestSpecificationChecks:
-
     def test_both_facets_and_wrap(self):
 
         err = "Cannot wrap facets when specifying both `col` and `row`."
@@ -48,7 +47,6 @@ class TestSpecificationChecks:
 
 
 class TestSubplotSpec:
-
     def test_single_subplot(self):
 
         s = Subplots({}, {}, {})
@@ -81,7 +79,6 @@ class TestSubplotSpec:
         spec = {
             "variables": {"col": col_key, "row": row_key},
             "structure": {"col": col_order, "row": row_order},
-
         }
         s = Subplots({}, spec, {})
 
@@ -268,7 +265,6 @@ class TestSubplotSpec:
 
 
 class TestSubplotElements:
-
     def test_single_subplot(self):
 
         s = Subplots({}, {}, {})
@@ -357,7 +353,7 @@ class TestSubplotElements:
             assert e["top"]
         for e in es[::n_cols]:
             assert e["left"]
-        for e in es[n_cols - 1::n_cols]:
+        for e in es[n_cols - 1 :: n_cols]:
             assert e["right"]
         for e in es[-n_cols:]:
             assert e["bottom"]
@@ -408,7 +404,7 @@ class TestSubplotElements:
         pair_spec = {
             "variables": {f"{var}{i}": val for i, val in enumerate(pairings)},
             "structure": {var: [f"{var}{i}" for i, _ in enumerate(pairings)]},
-            "wrap": wrap
+            "wrap": wrap,
         }
         s = Subplots({}, {}, pair_spec)
         s.init_figure(pair_spec)
@@ -450,7 +446,7 @@ class TestSubplotElements:
             assert e["top"]
         for e in es[::n_cols]:
             assert e["left"]
-        for e in es[n_cols - 1::n_cols]:
+        for e in es[n_cols - 1 :: n_cols]:
             assert e["right"]
         for e in es[-n_cols:]:
             assert e["bottom"]
@@ -468,7 +464,7 @@ class TestSubplotElements:
 
         pair_spec = {
             "structure": {"x": ["x0", "x1", "x2"], "y": ["y0", "y1", "y2"]},
-            "cross": False
+            "cross": False,
         }
         s = Subplots({}, {}, pair_spec)
         s.init_figure(pair_spec)
@@ -510,7 +506,7 @@ class TestSubplotElements:
             assert e["top"]
         for e in es[::n_cols]:
             assert e["left"]
-        for e in es[n_cols - 1::n_cols]:
+        for e in es[n_cols - 1 :: n_cols]:
             assert e["right"]
         for e in es[-n_cols:]:
             assert e["bottom"]

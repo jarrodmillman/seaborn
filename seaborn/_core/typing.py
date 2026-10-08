@@ -21,9 +21,7 @@ VariableSpecList = Union[List[VariableSpec], Index, None]
 # A DataSource can be a DataFrame, an object that is convertible to a DataFrame,
 # or a Mapping, and is optional in all contexts where it is used.
 class DataFrameProtocol(Protocol):
-
-    def to_pandas(self) -> DataFrame:
-        ...
+    def to_pandas(self) -> DataFrame: ...
 
 
 DataSource = Union[DataFrame, DataFrameProtocol, Mapping, None]
@@ -36,7 +34,10 @@ NormSpec = Union[Tuple[Optional[float], Optional[float]], Normalize, None]
 PaletteSpec = Union[str, list, dict, Colormap, None]
 DiscreteValueSpec = Union[dict, list, None]
 ContinuousValueSpec = Union[
-    Tuple[float, float], List[float], Dict[Any, float], None,
+    Tuple[float, float],
+    List[float],
+    Dict[Any, float],
+    None,
 ]
 
 

@@ -1,6 +1,7 @@
 """
 Components for parsing variable assignments and internally representing plot data.
 """
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sized
@@ -39,6 +40,7 @@ class PlotData:
         Dictionary mapping plot variable names to unique data source identifiers.
 
     """
+
     frame: DataFrame
     frames: dict[tuple, DataFrame]
     names: dict[str, str | None]
@@ -184,7 +186,6 @@ class PlotData:
             index = {}
 
         for key, val in variables.items():
-
             # Simply ignore variables with no specification
             if val is None:
                 continue
@@ -219,7 +220,6 @@ class PlotData:
                 names[key] = ids[key] = str(val)
 
             elif isinstance(val, str):
-
                 # This looks like a column name but, lookup failed.
 
                 err = f"Could not interpret value `{val}` for `{key}`. "
@@ -230,7 +230,6 @@ class PlotData:
                 raise ValueError(err)
 
             else:
-
                 # Otherwise, assume the value somehow represents data
 
                 # Ignore empty data structures

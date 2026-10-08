@@ -1,4 +1,5 @@
 """Algorithms to support fitting routines in seaborn plotting functions."""
+
 import numpy as np
 import warnings
 
@@ -64,7 +65,6 @@ def bootstrap(*args, **kwargs):
         units = np.asarray(units)
 
     if isinstance(func, str):
-
         # Allow named numpy functions
         f = getattr(np, func)
 
@@ -90,8 +90,7 @@ def bootstrap(*args, **kwargs):
 
     # Do the bootstrap
     if units is not None:
-        return _structured_bootstrap(args, n_boot, units, f,
-                                     func_kwargs, integers)
+        return _structured_bootstrap(args, n_boot, units, f, func_kwargs, integers)
 
     boot_dist = []
     for i in range(int(n_boot)):

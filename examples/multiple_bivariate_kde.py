@@ -4,6 +4,7 @@ Multiple bivariate KDE plots
 
 _thumb: .6, .45
 """
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -20,5 +21,5 @@ sns.kdeplot(
     x="sepal_width",
     y="sepal_length",
     hue="species",
-    thresh=.1,
+    thresh=0.1,
 )

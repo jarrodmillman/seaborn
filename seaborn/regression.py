@@ -1,4 +1,5 @@
 """Plotting functions for linear models (broadly construed)."""
+
 import copy
 from textwrap import dedent
 import warnings
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 
 try:
     import statsmodels
+
     assert statsmodels
     _has_statsmodels = True
 except ImportError:
@@ -29,6 +31,7 @@ class _LinearPlotter:
     code that can be abstracted out should be put here.
 
     """
+
     def establish_variables(self, data, **kws):
         """Extract variables from data or use directly."""
         self.data = data
@@ -73,12 +76,35 @@ class _RegressionPlotter(_LinearPlotter):
     This does the computations and drawing for the `regplot` function, and
     is thus also used indirectly by `lmplot`.
     """
-    def __init__(self, x, y, data=None, x_estimator=None, x_bins=None,
-                 x_ci="ci", scatter=True, fit_reg=True, ci=95, n_boot=1000,
-                 units=None, seed=None, order=1, logistic=False, lowess=False,
-                 robust=False, logx=False, x_partial=None, y_partial=None,
-                 truncate=False, dropna=True, x_jitter=None, y_jitter=None,
-                 color=None, label=None):
+
+    def __init__(
+        self,
+        x,
+        y,
+        data=None,
+        x_estimator=None,
+        x_bins=None,
+        x_ci="ci",
+        scatter=True,
+        fit_reg=True,
+        ci=95,
+        n_boot=1000,
+        units=None,
+        seed=None,
+        order=1,
+        logistic=False,
+        lowess=False,
+        robust=False,
+        logx=False,
+        x_partial=None,
+        y_partial=None,
+        truncate=False,
+        dropna=True,
+        x_jitter=None,
+        y_jitter=None,
+        color=None,
+        label=None,
+    ):
 
         # Set member attributes
         self.x_estimator = x_estimator
@@ -104,8 +130,9 @@ class _RegressionPlotter(_LinearPlotter):
             raise ValueError("Mutually exclusive regression options.")
 
         # Extract the data vals from the arguments or passed dataframe
-        self.establish_variables(data, x=x, y=y, units=units,
-                                 x_partial=x_partial, y_partial=y_partial)
+        self.establish_variables(
+            data, x=x, y=y, units=units, x_partial=x_partial, y_partial=y_partial
+        )
 
         # Drop null observations
         if dropna:
@@ -158,7 +185,6 @@ class _RegressionPlotter(_LinearPlotter):
         points, cis = [], []
 
         for val in vals:
-
             # Get the point estimate of the y variable
             _y = y[x == val]
             est = self.x_estimator(_y)
@@ -175,11 +201,13 @@ class _RegressionPlotter(_LinearPlotter):
                 else:
                     if self.units is not None:
                         units = self.units[x == val]
-                    boots = algo.bootstrap(_y,
-                                           func=self.x_estimator,
-                                           n_boot=self.n_boot,
-                                           units=units,
-                                           seed=self.seed)
+                    boots = algo.bootstrap(
+                        _y,
+                        func=self.x_estimator,
+                        n_boot=self.n_boot,
+                        units=units,
+                        seed=self.seed,
+                    )
                     _ci = utils.ci(boots, self.x_ci)
                 cis.append(_ci)
 
@@ -215,13 +243,14 @@ class _RegressionPlotter(_LinearPlotter):
         elif self.logistic:
             from statsmodels.genmod.generalized_linear_model import GLM
             from statsmodels.genmod.families import Binomial
-            yhat, yhat_boots = self.fit_statsmodels(grid, GLM,
-                                                    family=Binomial())
+
+            yhat, yhat_boots = self.fit_statsmodels(grid, GLM, family=Binomial())
         elif self.lowess:
             ci = None
             grid, yhat = self.fit_lowess()
         elif self.robust:
             from statsmodels.robust.robust_linear_model import RLM
+
             yhat, yhat_boots = self.fit_statsmodels(grid, RLM)
         elif self.logx:
             yhat, yhat_boots = self.fit_logx(grid)
@@ -238,6 +267,7 @@ class _RegressionPlotter(_LinearPlotter):
 
     def fit_fast(self, grid):
         """Low-level regression and prediction using linear algebra."""
+
         def reg_func(_x, _y):
             return np.linalg.pinv(_x).dot(_y)
 
@@ -247,16 +277,15 @@ class _RegressionPlotter(_LinearPlotter):
         if self.ci is None:
             return yhat, None
 
-        beta_boots = algo.bootstrap(X, y,
-                                    func=reg_func,
-                                    n_boot=self.n_boot,
-                                    units=self.units,
-                                    seed=self.seed).T
+        beta_boots = algo.bootstrap(
+            X, y, func=reg_func, n_boot=self.n_boot, units=self.units, seed=self.seed
+        ).T
         yhat_boots = grid.dot(beta_boots).T
         return yhat, yhat_boots
 
     def fit_poly(self, grid, order):
         """Regression using numpy polyfit for higher-order trends."""
+
         def reg_func(_x, _y):
             return np.polyval(np.polyfit(_x, _y, order), grid)
 
@@ -265,16 +294,15 @@ class _RegressionPlotter(_LinearPlotter):
         if self.ci is None:
             return yhat, None
 
-        yhat_boots = algo.bootstrap(x, y,
-                                    func=reg_func,
-                                    n_boot=self.n_boot,
-                                    units=self.units,
-                                    seed=self.seed)
+        yhat_boots = algo.bootstrap(
+            x, y, func=reg_func, n_boot=self.n_boot, units=self.units, seed=self.seed
+        )
         return yhat, yhat_boots
 
     def fit_statsmodels(self, grid, model, **kwargs):
         """More general regression function using statsmodels objects."""
         import statsmodels.tools.sm_exceptions as sme
+
         X, y = np.c_[np.ones(len(self.x)), self.x], self.y
         grid = np.c_[np.ones(len(grid)), grid]
 
@@ -296,16 +324,15 @@ class _RegressionPlotter(_LinearPlotter):
         if self.ci is None:
             return yhat, None
 
-        yhat_boots = algo.bootstrap(X, y,
-                                    func=reg_func,
-                                    n_boot=self.n_boot,
-                                    units=self.units,
-                                    seed=self.seed)
+        yhat_boots = algo.bootstrap(
+            X, y, func=reg_func, n_boot=self.n_boot, units=self.units, seed=self.seed
+        )
         return yhat, yhat_boots
 
     def fit_lowess(self):
         """Fit a locally-weighted regression, which returns its own grid."""
         from statsmodels.nonparametric.smoothers_lowess import lowess
+
         grid, yhat = lowess(self.y, self.x).T
         return grid, yhat
 
@@ -322,11 +349,9 @@ class _RegressionPlotter(_LinearPlotter):
         if self.ci is None:
             return yhat, None
 
-        beta_boots = algo.bootstrap(X, y,
-                                    func=reg_func,
-                                    n_boot=self.n_boot,
-                                    units=self.units,
-                                    seed=self.seed).T
+        beta_boots = algo.bootstrap(
+            X, y, func=reg_func, n_boot=self.n_boot, units=self.units, seed=self.seed
+        ).T
         yhat_boots = grid.dot(beta_boots).T
         return yhat, yhat_boots
 
@@ -363,7 +388,7 @@ class _RegressionPlotter(_LinearPlotter):
 
         # Use the current color cycle state as a default
         if self.color is None:
-            lines, = ax.plot([], [])
+            (lines,) = ax.plot([], [])
             color = lines.get_color()
             lines.remove()
         else:
@@ -404,8 +429,8 @@ class _RegressionPlotter(_LinearPlotter):
                 lw = mpl.rcParams["lines.markeredgewidth"]
             kws.setdefault("linewidths", lw)
 
-            if not hasattr(kws['color'], 'shape') or kws['color'].shape[1] < 4:
-                kws.setdefault("alpha", .8)
+            if not hasattr(kws["color"], "shape") or kws["color"].shape[1] < 4:
+                kws.setdefault("alpha", 0.8)
 
             x, y = self.scatter_data
             ax.scatter(x, y, **kws)
@@ -435,15 +460,14 @@ class _RegressionPlotter(_LinearPlotter):
         kws.setdefault("linewidth", lw)
 
         # Draw the regression line and confidence interval
-        line, = ax.plot(grid, yhat, **kws)
+        (line,) = ax.plot(grid, yhat, **kws)
         if not self.truncate:
             line.sticky_edges.x[:] = edges  # Prevent mpl from adding margin
         if err_bands is not None:
-            ax.fill_between(grid, *err_bands, facecolor=fill_color, alpha=.15)
+            ax.fill_between(grid, *err_bands, facecolor=fill_color, alpha=0.15)
 
 
 _regression_docs = dict(
-
     model_api=dedent("""\
     There are a number of mutually exclusive options for estimating the
     regression model. See the :ref:`tutorial <regression_tutorial>` for more
@@ -578,16 +602,47 @@ _regression_docs.update(_facet_docs)
 
 
 def lmplot(
-    data, *,
-    x=None, y=None, hue=None, col=None, row=None,
-    palette=None, col_wrap=None, height=5, aspect=1, markers="o",
-    sharex=None, sharey=None, hue_order=None, col_order=None, row_order=None,
-    legend=True, legend_out=None, x_estimator=None, x_bins=None,
-    x_ci="ci", scatter=True, fit_reg=True, ci=95, n_boot=1000,
-    units=None, seed=None, order=1, logistic=False, lowess=False,
-    robust=False, logx=False, x_partial=None, y_partial=None,
-    truncate=True, x_jitter=None, y_jitter=None, scatter_kws=None,
-    line_kws=None, facet_kws=None,
+    data,
+    *,
+    x=None,
+    y=None,
+    hue=None,
+    col=None,
+    row=None,
+    palette=None,
+    col_wrap=None,
+    height=5,
+    aspect=1,
+    markers="o",
+    sharex=None,
+    sharey=None,
+    hue_order=None,
+    col_order=None,
+    row_order=None,
+    legend=True,
+    legend_out=None,
+    x_estimator=None,
+    x_bins=None,
+    x_ci="ci",
+    scatter=True,
+    fit_reg=True,
+    ci=95,
+    n_boot=1000,
+    units=None,
+    seed=None,
+    order=1,
+    logistic=False,
+    lowess=False,
+    robust=False,
+    logx=False,
+    x_partial=None,
+    y_partial=None,
+    truncate=True,
+    x_jitter=None,
+    y_jitter=None,
+    scatter_kws=None,
+    line_kws=None,
+    facet_kws=None,
 ):
 
     if facet_kws is None:
@@ -616,10 +671,17 @@ def lmplot(
 
     # Initialize the grid
     facets = FacetGrid(
-        data, row=row, col=col, hue=hue,
+        data,
+        row=row,
+        col=col,
+        hue=hue,
         palette=palette,
-        row_order=row_order, col_order=col_order, hue_order=hue_order,
-        height=height, aspect=aspect, col_wrap=col_wrap,
+        row_order=row_order,
+        col_order=col_order,
+        hue_order=hue_order,
+        height=height,
+        aspect=aspect,
+        col_wrap=col_wrap,
         **facet_kws,
     )
 
@@ -632,8 +694,10 @@ def lmplot(
     if not isinstance(markers, list):
         markers = [markers] * n_markers
     if len(markers) != n_markers:
-        raise ValueError("markers must be a singleton or a list of markers "
-                         "for each level of the hue variable")
+        raise ValueError(
+            "markers must be a singleton or a list of markers "
+            "for each level of the hue variable"
+        )
     facets.hue_kws = {"marker": markers}
 
     def update_datalim(data, x, y, ax, **kws):
@@ -645,12 +709,27 @@ def lmplot(
 
     # Draw the regression plot on each facet
     regplot_kws = dict(
-        x_estimator=x_estimator, x_bins=x_bins, x_ci=x_ci,
-        scatter=scatter, fit_reg=fit_reg, ci=ci, n_boot=n_boot, units=units,
-        seed=seed, order=order, logistic=logistic, lowess=lowess,
-        robust=robust, logx=logx, x_partial=x_partial, y_partial=y_partial,
-        truncate=truncate, x_jitter=x_jitter, y_jitter=y_jitter,
-        scatter_kws=scatter_kws, line_kws=line_kws,
+        x_estimator=x_estimator,
+        x_bins=x_bins,
+        x_ci=x_ci,
+        scatter=scatter,
+        fit_reg=fit_reg,
+        ci=ci,
+        n_boot=n_boot,
+        units=units,
+        seed=seed,
+        order=order,
+        logistic=logistic,
+        lowess=lowess,
+        robust=robust,
+        logx=logx,
+        x_partial=x_partial,
+        y_partial=y_partial,
+        truncate=truncate,
+        x_jitter=x_jitter,
+        y_jitter=y_jitter,
+        scatter_kws=scatter_kws,
+        line_kws=line_kws,
     )
     facets.map_dataframe(regplot, x=x, y=y, **regplot_kws)
     facets.set_axis_labels(x, y)
@@ -759,21 +838,65 @@ lmplot.__doc__ = dedent("""\
 
 
 def regplot(
-    data=None, *, x=None, y=None,
-    x_estimator=None, x_bins=None, x_ci="ci",
-    scatter=True, fit_reg=True, ci=95, n_boot=1000, units=None,
-    seed=None, order=1, logistic=False, lowess=False, robust=False,
-    logx=False, x_partial=None, y_partial=None,
-    truncate=True, dropna=True, x_jitter=None, y_jitter=None,
-    label=None, color=None, marker="o",
-    scatter_kws=None, line_kws=None, ax=None
+    data=None,
+    *,
+    x=None,
+    y=None,
+    x_estimator=None,
+    x_bins=None,
+    x_ci="ci",
+    scatter=True,
+    fit_reg=True,
+    ci=95,
+    n_boot=1000,
+    units=None,
+    seed=None,
+    order=1,
+    logistic=False,
+    lowess=False,
+    robust=False,
+    logx=False,
+    x_partial=None,
+    y_partial=None,
+    truncate=True,
+    dropna=True,
+    x_jitter=None,
+    y_jitter=None,
+    label=None,
+    color=None,
+    marker="o",
+    scatter_kws=None,
+    line_kws=None,
+    ax=None,
 ):
 
-    plotter = _RegressionPlotter(x, y, data, x_estimator, x_bins, x_ci,
-                                 scatter, fit_reg, ci, n_boot, units, seed,
-                                 order, logistic, lowess, robust, logx,
-                                 x_partial, y_partial, truncate, dropna,
-                                 x_jitter, y_jitter, color, label)
+    plotter = _RegressionPlotter(
+        x,
+        y,
+        data,
+        x_estimator,
+        x_bins,
+        x_ci,
+        scatter,
+        fit_reg,
+        ci,
+        n_boot,
+        units,
+        seed,
+        order,
+        logistic,
+        lowess,
+        robust,
+        logx,
+        x_partial,
+        y_partial,
+        truncate,
+        dropna,
+        x_jitter,
+        y_jitter,
+        color,
+        label,
+    )
 
     if ax is None:
         ax = plt.gca()
@@ -862,10 +985,21 @@ regplot.__doc__ = dedent("""\
 
 
 def residplot(
-    data=None, *, x=None, y=None,
-    x_partial=None, y_partial=None, lowess=False,
-    order=1, robust=False, dropna=True, label=None, color=None,
-    scatter_kws=None, line_kws=None, ax=None
+    data=None,
+    *,
+    x=None,
+    y=None,
+    x_partial=None,
+    y_partial=None,
+    lowess=False,
+    order=1,
+    robust=False,
+    dropna=True,
+    label=None,
+    color=None,
+    scatter_kws=None,
+    line_kws=None,
+    ax=None,
 ):
     """Plot the residuals of a linear regression.
 
@@ -922,10 +1056,19 @@ def residplot(
     .. include:: ../docstrings/residplot.rst
 
     """
-    plotter = _RegressionPlotter(x, y, data, ci=None,
-                                 order=order, robust=robust,
-                                 x_partial=x_partial, y_partial=y_partial,
-                                 dropna=dropna, color=color, label=label)
+    plotter = _RegressionPlotter(
+        x,
+        y,
+        data,
+        ci=None,
+        order=order,
+        robust=robust,
+        x_partial=x_partial,
+        y_partial=y_partial,
+        dropna=dropna,
+        color=color,
+        label=label,
+    )
 
     if ax is None:
         ax = plt.gca()

@@ -15,7 +15,6 @@ def default_palette():
 
 
 class DotBase:
-
     def check_offsets(self, points, x, y):
 
         offsets = points.get_offsets().T
@@ -31,14 +30,13 @@ class DotBase:
 
 
 class TestDot(DotBase):
-
     def test_simple(self):
 
         x = [1, 2, 3]
         y = [4, 5, 2]
         p = Plot(x=x, y=y).add(Dot()).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         C0, *_ = p._theme["axes.prop_cycle"].by_key()["color"]
         self.check_offsets(points, x, y)
         self.check_colors("face", points, [C0] * 3, 1)
@@ -54,7 +52,7 @@ class TestDot(DotBase):
         mark = Dot(edgecolor="w", stroke=2, edgewidth=1)
         p = Plot(x=x, y=y).add(mark, marker=marker).scale(marker=shapes).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         C0, *_ = p._theme["axes.prop_cycle"].by_key()["color"]
         self.check_offsets(points, x, y)
         self.check_colors("face", points, [C0, to_rgba(C0, 0)], None)
@@ -70,7 +68,7 @@ class TestDot(DotBase):
 
         p = Plot(x=x, y=y).add(Dot()).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         self.check_offsets(points, [1, 3], [5, 4])
 
     @pytest.mark.parametrize("prop", ["color", "fill", "marker", "pointsize"])
@@ -82,22 +80,21 @@ class TestDot(DotBase):
 
         p = Plot(x=x, y=y, **{prop: z}).add(Dot()).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         self.check_offsets(points, [1, 3], [5, 4])
 
 
 class TestDots(DotBase):
-
     def test_simple(self):
 
         x = [1, 2, 3]
         y = [4, 5, 2]
         p = Plot(x=x, y=y).add(Dots()).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         C0, *_ = p._theme["axes.prop_cycle"].by_key()["color"]
         self.check_offsets(points, x, y)
-        self.check_colors("face", points, [C0] * 3, .2)
+        self.check_colors("face", points, [C0] * 3, 0.2)
         self.check_colors("edge", points, [C0] * 3, 1)
 
     def test_set_color(self):
@@ -107,9 +104,9 @@ class TestDots(DotBase):
         m = Dots(color=".25")
         p = Plot(x=x, y=y).add(m).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         self.check_offsets(points, x, y)
-        self.check_colors("face", points, [m.color] * 3, .2)
+        self.check_colors("face", points, [m.color] * 3, 0.2)
         self.check_colors("edge", points, [m.color] * 3, 1)
 
     def test_map_color(self):
@@ -119,10 +116,10 @@ class TestDots(DotBase):
         c = ["a", "b", "a"]
         p = Plot(x=x, y=y, color=c).add(Dots()).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         C0, C1, *_ = p._theme["axes.prop_cycle"].by_key()["color"]
         self.check_offsets(points, x, y)
-        self.check_colors("face", points, [C0, C1, C0], .2)
+        self.check_colors("face", points, [C0, C1, C0], 0.2)
         self.check_colors("edge", points, [C0, C1, C0], 1)
 
     def test_fill(self):
@@ -132,7 +129,7 @@ class TestDots(DotBase):
         c = ["a", "b", "a"]
         p = Plot(x=x, y=y, color=c).add(Dots(fill=False)).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         C0, C1, *_ = p._theme["axes.prop_cycle"].by_key()["color"]
         self.check_offsets(points, x, y)
         self.check_colors("face", points, [C0, C1, C0], 0)
@@ -145,9 +142,9 @@ class TestDots(DotBase):
         s = 3
         p = Plot(x=x, y=y).add(Dots(pointsize=s)).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         self.check_offsets(points, x, y)
-        assert_array_equal(points.get_sizes(), [s ** 2] * 3)
+        assert_array_equal(points.get_sizes(), [s**2] * 3)
 
     def test_stroke(self):
 
@@ -156,7 +153,7 @@ class TestDots(DotBase):
         s = 3
         p = Plot(x=x, y=y).add(Dots(stroke=s)).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         self.check_offsets(points, x, y)
         assert_array_equal(points.get_linewidths(), [s] * 3)
 
@@ -170,9 +167,9 @@ class TestDots(DotBase):
         mark = Dots(stroke=2)
         p = Plot(x=x, y=y).add(mark, marker=marker).scale(marker=shapes).plot()
         ax = p._figure.axes[0]
-        points, = ax.collections
+        (points,) = ax.collections
         C0, C1, *_ = p._theme["axes.prop_cycle"].by_key()["color"]
         self.check_offsets(points, x, y)
-        self.check_colors("face", points, [to_rgba(C0, .2), to_rgba(C0, 0)], None)
+        self.check_colors("face", points, [to_rgba(C0, 0.2), to_rgba(C0, 0)], None)
         self.check_colors("edge", points, [C0, C0], 1)
         assert_array_equal(points.get_linewidths(), [mark.stroke] * 2)

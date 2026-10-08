@@ -22,7 +22,6 @@ def norm_from_scale(scale, norm):
         vmin, vmax = norm  # TODO more helpful error if this fails?
 
     class ScaledNorm(mpl.colors.Normalize):
-
         def __call__(self, value, clip=None):
             # From github.com/matplotlib/matplotlib/blob/v3.4.2/lib/matplotlib/colors.py
             # See github.com/matplotlib/matplotlib/tree/v3.4.2/LICENSE
@@ -43,7 +42,7 @@ def norm_from_scale(scale, norm):
             if not np.isfinite([t_vmin, t_vmax]).all():
                 raise ValueError("Invalid vmin or vmax")
             t_value -= t_vmin
-            t_value /= (t_vmax - t_vmin)
+            t_value /= t_vmax - t_vmin
             t_value = np.ma.masked_invalid(t_value, copy=False)
             return t_value[0] if is_scalar else t_value
 

@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 
@@ -10,17 +9,18 @@ from seaborn._stats.aggregation import Agg, Est
 
 
 class AggregationFixtures:
-
     @pytest.fixture
     def df(self, rng):
 
         n = 30
-        return pd.DataFrame(dict(
-            x=rng.uniform(0, 7, n).round(),
-            y=rng.normal(size=n),
-            color=rng.choice(["a", "b", "c"], n),
-            group=rng.choice(["x", "y"], n),
-        ))
+        return pd.DataFrame(
+            dict(
+                x=rng.uniform(0, 7, n).round(),
+                y=rng.normal(size=n),
+                color=rng.choice(["a", "b", "c"], n),
+                group=rng.choice(["x", "y"], n),
+            )
+        )
 
     def get_groupby(self, df, orient):
 
@@ -30,7 +30,6 @@ class AggregationFixtures:
 
 
 class TestAgg(AggregationFixtures):
-
     def test_default(self, df):
 
         ori = "x"
@@ -50,11 +49,10 @@ class TestAgg(AggregationFixtures):
         grp = ["x", "color", "group"]
         index = pd.MultiIndex.from_product(
             [sorted(df["x"].unique()), df["color"].unique(), df["group"].unique()],
-            names=["x", "color", "group"]
+            names=["x", "color", "group"],
         )
         expected = (
-            df
-            .groupby(grp)
+            df.groupby(grp)
             .agg("mean")
             .reindex(index=index)
             .dropna()
@@ -76,7 +74,6 @@ class TestAgg(AggregationFixtures):
 
 
 class TestEst(AggregationFixtures):
-
     # Note: Most of the underlying code is exercised in tests/test_statistics
 
     @pytest.mark.parametrize("func", [np.mean, "mean"])

@@ -1,4 +1,5 @@
 """Turn the examples section of a function docstring into a notebook."""
+
 import re
 import sys
 import pydoc
@@ -27,7 +28,6 @@ def add_cell(nb, lines, cell_type):
 
 
 if __name__ == "__main__":
-
     _, name = sys.argv
 
     # Parse the docstring and get the examples section
@@ -46,7 +46,6 @@ if __name__ == "__main__":
     cell = []
 
     for line in lines:
-
         # Ignore matplotlib plot directive
         if ".. plot" in line or ":context:" in line:
             continue

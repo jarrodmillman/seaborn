@@ -1,4 +1,5 @@
 """Simplified split-apply-combine paradigm on dataframes for internal use."""
+
 from __future__ import annotations
 
 from typing import cast, Iterable
@@ -8,6 +9,7 @@ import pandas as pd
 from seaborn._core.rules import categorical_order
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import Callable
     from pandas import DataFrame, MultiIndex, Index
@@ -26,6 +28,7 @@ class GroupBy:
     - It increases future flexibility regarding alternate DataFrame libraries
 
     """
+
     def __init__(self, order: list[str] | dict[str, list | None]):
         """
         Initialize the GroupBy from grouping variables and optional level orders.
@@ -66,7 +69,7 @@ class GroupBy:
             grouper = list(levels)
             groups = pd.MultiIndex.from_product(levels.values(), names=grouper)
         else:
-            grouper, = list(levels)
+            (grouper,) = list(levels)
             groups = pd.Index(levels[grouper], name=grouper)
         return grouper, groups
 
@@ -92,8 +95,7 @@ class GroupBy:
             raise ValueError("No grouping variables are present in dataframe")
 
         res = (
-            data
-            .groupby(grouper, sort=False, observed=False)
+            data.groupby(grouper, sort=False, observed=False)
             .agg(*args, **kwargs)
             .reindex(groups)
             .reset_index()
@@ -103,8 +105,11 @@ class GroupBy:
         return res
 
     def apply(
-        self, data: DataFrame, func: Callable[..., DataFrame],
-        *args, **kwargs,
+        self,
+        data: DataFrame,
+        func: Callable[..., DataFrame],
+        *args,
+        **kwargs,
     ) -> DataFrame:
         """Apply a DataFrame -> DataFrame mapping to each group."""
         grouper, groups = self._get_groups(data)

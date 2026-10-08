@@ -15,6 +15,7 @@ from . import cm  # noqa: F401
 
 # Capture the original matplotlib rcParams
 import matplotlib as mpl
+
 _orig_rc_params = mpl.rcParams.copy()
 
 # Define the seaborn version

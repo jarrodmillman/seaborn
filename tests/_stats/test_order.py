@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 
@@ -10,7 +9,6 @@ from seaborn._stats.order import Perc
 
 
 class Fixtures:
-
     @pytest.fixture
     def df(self, rng):
         return pd.DataFrame(dict(x="", y=rng.normal(size=30)))
@@ -23,7 +21,6 @@ class Fixtures:
 
 
 class TestPerc(Fixtures):
-
     def test_int_k(self, df):
 
         ori = "x"

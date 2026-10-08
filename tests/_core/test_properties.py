@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -26,7 +25,6 @@ from seaborn.palettes import color_palette
 
 
 class DataFixtures:
-
     @pytest.fixture
     def num_vector(self, long_df):
         return long_df["s"]
@@ -61,7 +59,6 @@ class DataFixtures:
 
 
 class TestCoordinate(DataFixtures):
-
     def test_bad_scale_arg_str(self, num_vector):
 
         err = "Unknown magic arg for x scale: 'xxx'."
@@ -76,7 +73,6 @@ class TestCoordinate(DataFixtures):
 
 
 class TestColor(DataFixtures):
-
     def assert_same_rgb(self, a, b):
         assert_array_equal(a[:, :3], b[:, :3])
 
@@ -199,7 +195,7 @@ class TestColor(DataFixtures):
 
     @pytest.mark.parametrize(
         "data_type,scale_class",
-        [("cat", Nominal), ("num", Continuous), ("bool", Boolean)]
+        [("cat", Nominal), ("num", Continuous), ("bool", Boolean)],
     )
     def test_default(self, data_type, scale_class, vectors):
 
@@ -230,7 +226,7 @@ class TestColor(DataFixtures):
             (("g", "m"), "cat", Nominal),  # Based on tuple / variable type
             (("c", "y"), "bool", Boolean),  # Based on tuple / variable type
             (get_colormap("inferno"), "num", Continuous),  # Based on callable
-        ]
+        ],
     )
     def test_inference(self, values, data_type, scale_class, vectors):
 
@@ -244,8 +240,8 @@ class TestColor(DataFixtures):
         assert f("C3") == to_rgb("C3")
         assert f("dodgerblue") == to_rgb("dodgerblue")
 
-        assert f((.1, .2, .3)) == (.1, .2, .3)
-        assert f((.1, .2, .3, .4)) == (.1, .2, .3, .4)
+        assert f((0.1, 0.2, 0.3)) == (0.1, 0.2, 0.3)
+        assert f((0.1, 0.2, 0.3, 0.4)) == (0.1, 0.2, 0.3, 0.4)
 
         assert f("#123456") == to_rgb("#123456")
         assert f("#12345678") == to_rgba("#12345678")
@@ -255,7 +251,6 @@ class TestColor(DataFixtures):
 
 
 class ObjectPropertyBase(DataFixtures):
-
     def assert_equal(self, a, b):
 
         assert self.unpack(a) == self.unpack(b)
@@ -302,7 +297,7 @@ class ObjectPropertyBase(DataFixtures):
         mapping = self.prop().get_mapping(Nominal(), x)
         n = x.nunique()
         for i, expected in enumerate(self.prop()._default_values(n)):
-            actual, = mapping([i])
+            (actual,) = mapping([i])
             self.assert_equal(actual, expected)
 
     @pytest.mark.parametrize("data_type", ["cat", "num"])
@@ -312,7 +307,7 @@ class ObjectPropertyBase(DataFixtures):
         scale = Nominal(self.values)
         mapping = self.prop().get_mapping(scale, x)
         for i, expected in enumerate(self.standardized_values):
-            actual, = mapping([i])
+            (actual,) = mapping([i])
             self.assert_equal(actual, expected)
 
     @pytest.mark.parametrize("data_type", ["cat", "num"])
@@ -326,7 +321,7 @@ class ObjectPropertyBase(DataFixtures):
         scale = Nominal(values)
         mapping = self.prop().get_mapping(scale, x)
         for i, level in enumerate(levels):
-            actual, = mapping([i])
+            (actual,) = mapping([i])
             expected = standardized_values[level]
             self.assert_equal(actual, expected)
 
@@ -354,7 +349,6 @@ class ObjectPropertyBase(DataFixtures):
 
 
 class TestMarker(ObjectPropertyBase):
-
     prop = Marker
     values = ["o", (5, 2, 0), MarkerStyle("^")]
     standardized_values = [MarkerStyle(x) for x in values]
@@ -380,9 +374,8 @@ class TestMarker(ObjectPropertyBase):
 
 
 class TestLineStyle(ObjectPropertyBase):
-
     prop = LineStyle
-    values = ["solid", "--", (1, .5)]
+    values = ["solid", "--", (1, 0.5)]
     standardized_values = [LineStyle._get_dash_pattern(x) for x in values]
 
     def test_bad_type(self):
@@ -405,14 +398,13 @@ class TestLineStyle(ObjectPropertyBase):
 
 
 class TestFill(DataFixtures):
-
     @pytest.fixture
     def vectors(self):
 
         return {
             "cat": pd.Series(["a", "a", "b"]),
             "num": pd.Series([1, 1, 2]),
-            "bool": pd.Series([True, True, False])
+            "bool": pd.Series([True, True, False]),
         }
 
     @pytest.fixture
@@ -487,32 +479,37 @@ class TestFill(DataFixtures):
 
 
 class IntervalBase(DataFixtures):
-
     def norm(self, x):
         return (x - x.min()) / (x.max() - x.min())
 
-    @pytest.mark.parametrize("data_type,scale_class", [
-        ("cat", Nominal),
-        ("num", Continuous),
-        ("bool", Boolean),
-    ])
+    @pytest.mark.parametrize(
+        "data_type,scale_class",
+        [
+            ("cat", Nominal),
+            ("num", Continuous),
+            ("bool", Boolean),
+        ],
+    )
     def test_default(self, data_type, scale_class, vectors):
 
         x = vectors[data_type]
         scale = self.prop().default_scale(x)
         assert isinstance(scale, scale_class)
 
-    @pytest.mark.parametrize("arg,data_type,scale_class", [
-        ((1, 3), "cat", Nominal),
-        ((1, 3), "num", Continuous),
-        ((1, 3), "bool", Boolean),
-        ([1, 2, 3], "cat", Nominal),
-        ([1, 2, 3], "num", Nominal),
-        ([1, 3], "bool", Boolean),
-        ({"a": 1, "b": 3, "c": 2}, "cat", Nominal),
-        ({2: 1, 4: 3, 8: 2}, "num", Nominal),
-        ({True: 4, False: 2}, "bool", Boolean),
-    ])
+    @pytest.mark.parametrize(
+        "arg,data_type,scale_class",
+        [
+            ((1, 3), "cat", Nominal),
+            ((1, 3), "num", Continuous),
+            ((1, 3), "bool", Boolean),
+            ([1, 2, 3], "cat", Nominal),
+            ([1, 2, 3], "num", Nominal),
+            ([1, 3], "bool", Boolean),
+            ({"a": 1, "b": 3, "c": 2}, "cat", Nominal),
+            ({2: 1, 4: 3, 8: 2}, "num", Nominal),
+            ({True: 4, False: 2}, "bool", Boolean),
+        ],
+    )
     def test_inference(self, arg, data_type, scale_class, vectors):
 
         x = vectors[data_type]

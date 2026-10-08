@@ -17,7 +17,7 @@ import logging
 import seaborn
 from seaborn._core.properties import PROPERTIES
 
-sys.path.insert(0, os.path.abspath('sphinxext'))
+sys.path.insert(0, os.path.abspath("sphinxext"))
 
 # The secondary_sidebar_items config below intentionally overlaps two wildcard
 # patterns (** and generated/*) so that the API entity pages get an empty right
@@ -30,9 +30,9 @@ logging.getLogger("sphinx.pydata_sphinx_theme.utils").addFilter(
 
 # -- Project information -----------------------------------------------------
 
-project = 'seaborn'
-copyright = f'2012-{time.strftime("%Y")}'
-author = 'Michael Waskom'
+project = "seaborn"
+copyright = f"2012-{time.strftime('%Y')}"
+author = "Michael Waskom"
 version = release = seaborn.__version__
 
 
@@ -42,45 +42,45 @@ version = release = seaborn.__version__
 # extensions coming with Sphinx (amed 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx',
-    'matplotlib.sphinxext.plot_directive',
-    'gallery_generator',
-    'tutorial_builder',
-    'numpydoc',
-    'sphinx_copybutton',
-    'sphinx_issues',
-    'sphinx_design',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.intersphinx",
+    "matplotlib.sphinxext.plot_directive",
+    "gallery_generator",
+    "tutorial_builder",
+    "numpydoc",
+    "sphinx_copybutton",
+    "sphinx_issues",
+    "sphinx_design",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The root document.
-root_doc = 'index'
+root_doc = "index"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'docstrings', 'nextgen', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "docstrings", "nextgen", "Thumbs.db", ".DS_Store"]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
-default_role = 'literal'
+default_role = "literal"
 
 # Generate the API documentation when building
 autosummary_generate = True
 numpydoc_show_class_members = False
 
 # Sphinx-issues configuration
-issues_github_path = 'mwaskom/seaborn'
+issues_github_path = "mwaskom/seaborn"
 
 # Include the example source for plots in API docs
 plot_include_source = True
-plot_formats = [('png', 90)]
+plot_formats = [("png", 90)]
 plot_html_show_formats = False
 plot_html_show_source_link = False
 
@@ -115,27 +115,29 @@ rst_epilog = r"""
 
 """  # noqa
 
-rst_epilog += "\n".join([
-    f".. |{key}| replace:: :ref:`{key} <{val.__class__.__name__.lower()}_property>`"
-    for key, val in PROPERTIES.items()
-])
+rst_epilog += "\n".join(
+    [
+        f".. |{key}| replace:: :ref:`{key} <{val.__class__.__name__.lower()}_property>`"
+        for key, val in PROPERTIES.items()
+    ]
+)
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'pydata_sphinx_theme'
+html_theme = "pydata_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named 'default.css' will overwrite the builtin 'default.css'.
-html_static_path = ['_static', 'example_thumbs']
+html_static_path = ["_static", "example_thumbs"]
 for path in html_static_path:
     if not os.path.exists(path):
         os.makedirs(path)
 
-html_css_files = ['css/custom.css']
+html_css_files = ["css/custom.css"]
 
 html_logo = "_static/logo-wide-lightbg.svg"
 html_favicon = "_static/favicon.ico"
@@ -183,9 +185,9 @@ html_sidebars = {
 # -- Intersphinx ------------------------------------------------
 
 intersphinx_mapping = {
-    'numpy': ('https://numpy.org/doc/stable/', None),
-    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
-    'matplotlib': ('https://matplotlib.org/stable', None),
-    'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
-    'statsmodels': ('https://www.statsmodels.org/stable/', None)
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/", None),
+    "matplotlib": ("https://matplotlib.org/stable", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "statsmodels": ("https://www.statsmodels.org/stable/", None),
 }

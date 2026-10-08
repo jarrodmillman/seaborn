@@ -26,6 +26,7 @@ See the documentation for other :class:`Plot` methods to learn about the many
 ways that a plot can be enhanced and customized.
 
 """
+
 from seaborn._core.plot import Plot  # noqa: F401
 
 from seaborn._marks.base import Mark  # noqa: F401
@@ -45,5 +46,9 @@ from seaborn._stats.regression import PolyFit  # noqa: F401
 from seaborn._core.moves import Dodge, Jitter, Norm, Shift, Stack, Move  # noqa: F401
 
 from seaborn._core.scales import (  # noqa: F401
-    Boolean, Continuous, Nominal, Temporal, Scale
+    Boolean,
+    Continuous,
+    Nominal,
+    Temporal,
+    Scale,
 )

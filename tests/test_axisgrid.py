@@ -25,13 +25,16 @@ rs = np.random.RandomState(0)
 
 
 class TestFacetGrid:
-
-    df = pd.DataFrame(dict(x=rs.normal(size=60),
-                           y=rs.gamma(4, size=60),
-                           a=np.repeat(list("abc"), 20),
-                           b=np.tile(list("mn"), 30),
-                           c=np.tile(list("tuv"), 20),
-                           d=np.tile(list("abcdefghijkl"), 5)))
+    df = pd.DataFrame(
+        dict(
+            x=rs.normal(size=60),
+            y=rs.gamma(4, size=60),
+            a=np.repeat(list("abc"), 20),
+            b=np.tile(list("mn"), 30),
+            c=np.tile(list("tuv"), 20),
+            d=np.tile(list("abcdefghijkl"), 5),
+        )
+    )
 
     def test_self_data(self):
 
@@ -151,8 +154,7 @@ class TestFacetGrid:
         null = np.empty(0, object).flat
 
         g = ag.FacetGrid(self.df, col="a", col_wrap=2)
-        npt.assert_array_equal(g._bottom_axes,
-                               g.axes[np.array([1, 2])].flat)
+        npt.assert_array_equal(g._bottom_axes, g.axes[np.array([1, 2])].flat)
         npt.assert_array_equal(g._not_bottom_axes, g.axes[:1].flat)
         npt.assert_array_equal(g._left_axes, g.axes[np.array([0, 2])].flat)
         npt.assert_array_equal(g._not_left_axes, g.axes[np.array([1])].flat)
@@ -166,17 +168,17 @@ class TestFacetGrid:
 
         g = ag.FacetGrid(self.df, row="c")
         assert list(g.axes_dict.keys()) == g.row_names
-        for (name, ax) in zip(g.row_names, g.axes.flat):
+        for name, ax in zip(g.row_names, g.axes.flat):
             assert g.axes_dict[name] is ax
 
         g = ag.FacetGrid(self.df, col="c")
         assert list(g.axes_dict.keys()) == g.col_names
-        for (name, ax) in zip(g.col_names, g.axes.flat):
+        for name, ax in zip(g.col_names, g.axes.flat):
             assert g.axes_dict[name] is ax
 
         g = ag.FacetGrid(self.df, col="a", col_wrap=2)
         assert list(g.axes_dict.keys()) == g.col_names
-        for (name, ax) in zip(g.col_names, g.axes.flat):
+        for name, ax in zip(g.col_names, g.axes.flat):
             assert g.axes_dict[name] is ax
 
         g = ag.FacetGrid(self.df, row="a", col="c")
@@ -193,18 +195,19 @@ class TestFacetGrid:
         g = ag.FacetGrid(self.df, row="a", col="b", height=6)
         npt.assert_array_equal(g.figure.get_size_inches(), (12, 18))
 
-        g = ag.FacetGrid(self.df, col="c", height=4, aspect=.5)
+        g = ag.FacetGrid(self.df, col="c", height=4, aspect=0.5)
         npt.assert_array_equal(g.figure.get_size_inches(), (6, 4))
 
     def test_figure_size_with_legend(self):
 
-        g = ag.FacetGrid(self.df, col="a", hue="c", height=4, aspect=.5)
+        g = ag.FacetGrid(self.df, col="a", hue="c", height=4, aspect=0.5)
         npt.assert_array_equal(g.figure.get_size_inches(), (6, 4))
         g.add_legend()
         assert g.figure.get_size_inches()[0] > 6
 
-        g = ag.FacetGrid(self.df, col="a", hue="c", height=4, aspect=.5,
-                         legend_out=False)
+        g = ag.FacetGrid(
+            self.df, col="a", hue="c", height=4, aspect=0.5, legend_out=False
+        )
         npt.assert_array_equal(g.figure.get_size_inches(), (6, 4))
         g.add_legend()
         npt.assert_array_equal(g.figure.get_size_inches(), (6, 4))
@@ -307,14 +310,13 @@ class TestFacetGrid:
 
     def test_legendout_with_colwrap(self):
 
-        g = ag.FacetGrid(self.df, col="d", hue='b',
-                         col_wrap=4, legend_out=False)
+        g = ag.FacetGrid(self.df, col="d", hue="b", col_wrap=4, legend_out=False)
         g.map(plt.plot, "x", "y", linewidth=3)
         g.add_legend()
 
     def test_legend_tight_layout(self):
 
-        g = ag.FacetGrid(self.df, hue='b')
+        g = ag.FacetGrid(self.df, hue="b")
         g.map(plt.plot, "x", "y", linewidth=3)
         g.add_legend()
         g.tight_layout()
@@ -326,8 +328,7 @@ class TestFacetGrid:
 
     def test_subplot_kws(self):
 
-        g = ag.FacetGrid(self.df, despine=False,
-                         subplot_kws=dict(projection="polar"))
+        g = ag.FacetGrid(self.df, despine=False, subplot_kws=dict(projection="polar"))
         for ax in g.axes.flat:
             assert "PolarAxes" in ax.__class__.__name__
 
@@ -335,7 +336,7 @@ class TestFacetGrid:
         ratios = [3, 1, 2]
 
         gskws = dict(width_ratios=ratios)
-        g = ag.FacetGrid(self.df, col='c', row='a', gridspec_kws=gskws)
+        g = ag.FacetGrid(self.df, col="c", row="a", gridspec_kws=gskws)
 
         for ax in g.axes.flat:
             ax.set_xticks([])
@@ -343,7 +344,7 @@ class TestFacetGrid:
 
         g.figure.tight_layout()
 
-        for (l, m, r) in g.axes:
+        for l, m, r in g.axes:
             assert l.get_position().width > m.get_position().width
             assert r.get_position().width > m.get_position().width
 
@@ -352,7 +353,7 @@ class TestFacetGrid:
 
         gskws = dict(width_ratios=ratios)
         with pytest.warns(UserWarning):
-            ag.FacetGrid(self.df, col='d', col_wrap=5, gridspec_kws=gskws)
+            ag.FacetGrid(self.df, col="d", col_wrap=5, gridspec_kws=gskws)
 
     def test_data_generator(self):
 
@@ -415,6 +416,7 @@ class TestFacetGrid:
 
         def plot(x, y, data=None, **kws):
             plt.plot(data[x], data[y], **kws)
+
         # Modify __module__ so this doesn't look like a seaborn function
         plot.__module__ = "test"
 
@@ -470,7 +472,7 @@ class TestFacetGrid:
 
         # test with dropna=False
         g = ag.FacetGrid(self.df, col="b", hue="b", dropna=False)
-        g.map(plt.plot, 'x', 'y')
+        g.map(plt.plot, "x", "y")
 
     def test_set_titles_margin_titles(self):
 
@@ -534,8 +536,8 @@ class TestFacetGrid:
 
         g = ag.FacetGrid(self.df, row="a", col="b")
         g.map(plt.plot, "x", "y")
-        xlab = 'xx'
-        ylab = 'yy'
+        xlab = "xx"
+        ylab = "yy"
 
         g.set_axis_labels(xlab, ylab)
 
@@ -568,20 +570,30 @@ class TestFacetGrid:
         assert g.hue_names == list("tuv")
         assert g.axes.shape == (3, 2)
 
-        g = ag.FacetGrid(self.df, row="a", col="b", hue="c",
-                         row_order=list("bca"),
-                         col_order=list("nm"),
-                         hue_order=list("vtu"))
+        g = ag.FacetGrid(
+            self.df,
+            row="a",
+            col="b",
+            hue="c",
+            row_order=list("bca"),
+            col_order=list("nm"),
+            hue_order=list("vtu"),
+        )
 
         assert g.row_names == list("bca")
         assert g.col_names == list("nm")
         assert g.hue_names == list("vtu")
         assert g.axes.shape == (3, 2)
 
-        g = ag.FacetGrid(self.df, row="a", col="b", hue="c",
-                         row_order=list("bcda"),
-                         col_order=list("nom"),
-                         hue_order=list("qvtu"))
+        g = ag.FacetGrid(
+            self.df,
+            row="a",
+            col="b",
+            hue="c",
+            row_order=list("bcda"),
+            col_order=list("nom"),
+            hue_order=list("qvtu"),
+        )
 
         assert g.row_names == list("bcda")
         assert g.col_names == list("nom")
@@ -607,8 +619,7 @@ class TestFacetGrid:
         assert g._colors == list_pal
 
         list_pal = color_palette(["green", "blue", "red"], 3)
-        g = ag.FacetGrid(self.df, hue="c", hue_order=list("uvt"),
-                         palette=dict_pal)
+        g = ag.FacetGrid(self.df, hue="c", hue_order=list("uvt"), palette=dict_pal)
         assert g._colors == list_pal
 
     def test_hue_kws(self):
@@ -635,11 +646,11 @@ class TestFacetGrid:
     def test_categorical_column_missing_categories(self):
 
         df = self.df.copy()
-        df['a'] = df['a'].astype('category')
+        df["a"] = df["a"].astype("category")
 
-        g = ag.FacetGrid(df[df['a'] == 'a'], col="a", col_wrap=1)
+        g = ag.FacetGrid(df[df["a"] == "a"], col="a", col_wrap=1)
 
-        assert g.axes.shape == (len(df['a'].cat.categories),)
+        assert g.axes.shape == (len(df["a"].cat.categories),)
 
     def test_categorical_warning(self):
 
@@ -659,13 +670,13 @@ class TestFacetGrid:
         vline = np.array([[refx, 0], [refx, 1]])
         g.refline(x=refx, y=refy)
         for ax in g.axes.flat:
-            assert ax.lines[0].get_color() == '.5'
-            assert ax.lines[0].get_linestyle() == '--'
+            assert ax.lines[0].get_color() == ".5"
+            assert ax.lines[0].get_linestyle() == "--"
             assert len(ax.lines) == 2
             npt.assert_array_equal(ax.lines[0].get_xydata(), vline)
             npt.assert_array_equal(ax.lines[1].get_xydata(), hline)
 
-        color, linestyle = 'red', '-'
+        color, linestyle = "red", "-"
         g.refline(x=refx, color=color, linestyle=linestyle)
         npt.assert_array_equal(g.axes[0, 0].lines[-1].get_xydata(), vline)
         assert g.axes[0, 0].lines[-1].get_color() == color
@@ -676,7 +687,7 @@ class TestFacetGrid:
         def f(grid, color):
             grid.figure.set_facecolor(color)
 
-        color = (.1, .6, .3, .9)
+        color = (0.1, 0.6, 0.3, 0.9)
         g = ag.FacetGrid(long_df)
         res = g.apply(f, color)
         assert res is g
@@ -688,7 +699,7 @@ class TestFacetGrid:
             grid.figure.set_facecolor(color)
             return color
 
-        color = (.1, .6, .3, .9)
+        color = (0.1, 0.6, 0.3, 0.9)
         g = ag.FacetGrid(long_df)
         res = g.pipe(f, color)
         assert res == color
@@ -709,7 +720,7 @@ class TestFacetGrid:
 
     @pytest.mark.skipif(
         condition=not hasattr(pd.api, "interchange"),
-        reason="Tests behavior assuming support for dataframe interchange"
+        reason="Tests behavior assuming support for dataframe interchange",
     )
     def test_data_interchange(self, mock_long_df, long_df):
 
@@ -722,13 +733,16 @@ class TestFacetGrid:
 
 
 class TestPairGrid:
-
     rs = np.random.RandomState(sum(map(ord, "PairGrid")))
-    df = pd.DataFrame(dict(x=rs.normal(size=60),
-                           y=rs.randint(0, 4, size=(60)),
-                           z=rs.gamma(3, size=60),
-                           a=np.repeat(list("abc"), 20),
-                           b=np.repeat(list("abcdefghijkl"), 5)))
+    df = pd.DataFrame(
+        dict(
+            x=rs.normal(size=60),
+            y=rs.randint(0, 4, size=(60)),
+            z=rs.gamma(3, size=60),
+            a=np.repeat(list("abc"), 20),
+            b=np.repeat(list("abcdefghijkl"), 5),
+        )
+    )
 
     def test_self_data(self):
 
@@ -738,9 +752,9 @@ class TestPairGrid:
     def test_ignore_datelike_data(self):
 
         df = self.df.copy()
-        df['date'] = pd.date_range('2010-01-01', periods=len(df), freq='D')
+        df["date"] = pd.date_range("2010-01-01", periods=len(df), freq="D")
         result = ag.PairGrid(self.df).data
-        expected = df.drop('date', axis=1)
+        expected = df.drop("date", axis=1)
         tm.assert_frame_equal(result, expected)
 
     def test_self_figure(self):
@@ -824,11 +838,10 @@ class TestPairGrid:
         g1 = ag.PairGrid(self.df, height=3)
         npt.assert_array_equal(g1.fig.get_size_inches(), (9, 9))
 
-        g2 = ag.PairGrid(self.df, height=4, aspect=.5)
+        g2 = ag.PairGrid(self.df, height=4, aspect=0.5)
         npt.assert_array_equal(g2.fig.get_size_inches(), (6, 12))
 
-        g3 = ag.PairGrid(self.df, y_vars=["z"], x_vars=["x", "y"],
-                         height=2, aspect=2)
+        g3 = ag.PairGrid(self.df, y_vars=["z"], x_vars=["x", "y"], height=2, aspect=2)
         npt.assert_array_equal(g3.fig.get_size_inches(), (8, 2))
 
     def test_empty_grid(self):
@@ -946,7 +959,7 @@ class TestPairGrid:
             assert len(ax.patches) == 30
 
         g = ag.PairGrid(self.df, hue="a")
-        g.map_diag(plt.hist, histtype='step')
+        g.map_diag(plt.hist, histtype="step")
 
         for ax in g.diag_axes:
             for ptch in ax.patches:
@@ -968,7 +981,6 @@ class TestPairGrid:
 
         for j, x_var in enumerate(x_vars):
             for i, y_var in enumerate(y_vars):
-
                 ax = g1.axes[i, j]
                 if x_var == y_var:
                     diag_ax = g1.diag_axes[j]  # because fewer x than y vars
@@ -1002,7 +1014,6 @@ class TestPairGrid:
 
         for j, x_var in enumerate(x_vars):
             for i, y_var in enumerate(y_vars):
-
                 ax = g3.axes[i, j]
                 if x_var == y_var:
                     diag_ax = g3.diag_axes[i]  # because fewer y than x vars
@@ -1024,7 +1035,7 @@ class TestPairGrid:
                 assert_colors_equal(patch.get_facecolor(), color)
 
         g2 = ag.PairGrid(self.df)
-        g2.map_diag(kdeplot, color='red')
+        g2.map_diag(kdeplot, color="red")
 
         for ax in g2.diag_axes:
             for line in ax.lines:
@@ -1111,8 +1122,7 @@ class TestPairGrid:
         assert g.palette == list_pal
 
         list_pal = color_palette(["blue", "red", "green"])
-        g = ag.PairGrid(self.df, hue="a", hue_order=list("cab"),
-                        palette=dict_pal)
+        g = ag.PairGrid(self.df, hue="a", hue_order=list("cab"), palette=dict_pal)
         assert g.palette == list_pal
 
     def test_hue_kws(self):
@@ -1124,8 +1134,7 @@ class TestPairGrid:
         for line, marker in zip(g.axes[0, 0].lines, kws["marker"]):
             assert line.get_marker() == marker
 
-        g = ag.PairGrid(self.df, hue="a", hue_kws=kws,
-                        hue_order=list("dcab"))
+        g = ag.PairGrid(self.df, hue="a", hue_kws=kws, hue_order=list("dcab"))
         g.map(plt.plot)
 
         for line, marker in zip(g.axes[0, 0].lines, kws["marker"]):
@@ -1372,7 +1381,8 @@ class TestPairGrid:
 
         assert not np.array_equal(c1.get_facecolor(), c2.get_facecolor())
         assert not np.array_equal(
-            c1.get_paths()[0].vertices, c2.get_paths()[0].vertices,
+            c1.get_paths()[0].vertices,
+            c2.get_paths()[0].vertices,
         )
 
     def test_pairplot_diag_kde(self):
@@ -1477,7 +1487,7 @@ class TestPairGrid:
 
     @pytest.mark.skipif(
         condition=not hasattr(pd.api, "interchange"),
-        reason="Tests behavior assuming support for dataframe interchange"
+        reason="Tests behavior assuming support for dataframe interchange",
     )
     def test_data_interchange(self, mock_long_df, long_df):
 
@@ -1490,7 +1500,6 @@ class TestPairGrid:
 
 
 class TestJointGrid:
-
     rs = np.random.RandomState(sum(map(ord, "JointGrid")))
     x = rs.randn(100)
     y = rs.randn(100)
@@ -1632,7 +1641,8 @@ class TestJointGrid:
         assert joint_bounds[3] == marg_y_bounds[3]
 
     @pytest.mark.parametrize(
-        "as_vector", [True, False],
+        "as_vector",
+        [True, False],
     )
     def test_hue(self, long_df, as_vector):
 
@@ -1670,8 +1680,8 @@ class TestJointGrid:
         assert not g.ax_joint.lines and not g.ax_marg_x.lines and not g.ax_marg_y.lines
 
         g.refline(x=refx, y=refy)
-        assert g.ax_joint.lines[0].get_color() == '.5'
-        assert g.ax_joint.lines[0].get_linestyle() == '--'
+        assert g.ax_joint.lines[0].get_color() == ".5"
+        assert g.ax_joint.lines[0].get_linestyle() == "--"
         assert len(g.ax_joint.lines) == 2
         assert len(g.ax_marg_x.lines) == 1
         assert len(g.ax_marg_y.lines) == 1
@@ -1680,7 +1690,7 @@ class TestJointGrid:
         npt.assert_array_equal(g.ax_marg_x.lines[0].get_xydata(), vline)
         npt.assert_array_equal(g.ax_marg_y.lines[0].get_xydata(), hline)
 
-        color, linestyle = 'red', '-'
+        color, linestyle = "red", "-"
         g.refline(x=refx, marginal=False, color=color, linestyle=linestyle)
         npt.assert_array_equal(g.ax_joint.lines[-1].get_xydata(), vline)
         assert g.ax_joint.lines[-1].get_color() == color
@@ -1701,7 +1711,6 @@ class TestJointGrid:
 
 
 class TestJointPlot:
-
     rs = np.random.RandomState(sum(map(ord, "jointplot")))
     x = rs.randn(100)
     y = rs.randn(100)
@@ -1837,8 +1846,9 @@ class TestJointPlot:
     def test_hex_customise(self):
 
         # test that default gridsize can be overridden
-        g = ag.jointplot(x="x", y="y", data=self.data, kind="hex",
-                         joint_kws=dict(gridsize=5))
+        g = ag.jointplot(
+            x="x", y="y", data=self.data, kind="hex", joint_kws=dict(gridsize=5)
+        )
         assert len(g.ax_joint.collections) == 1
         a = g.ax_joint.collections[0].get_array()
         assert a.shape[0] == 28  # 28 hexagons expected for gridsize 5
@@ -1860,8 +1870,9 @@ class TestJointPlot:
         for kwarg in ("joint_kws", "marginal_kws"):
             for kind in ("hex", "kde", "resid", "reg", "scatter"):
                 empty_dict = {}
-                ag.jointplot(x="x", y="y", data=self.data, kind=kind,
-                             **{kwarg: empty_dict})
+                ag.jointplot(
+                    x="x", y="y", data=self.data, kind=kind, **{kwarg: empty_dict}
+                )
                 assert empty_dict == {}
 
     def test_distplot_kwarg_warning(self, long_df):

@@ -54,10 +54,12 @@ def assert_legends_equal(leg1, leg2):
         assert t1.get_text() == t2.get_text()
 
     assert_artists_equal(
-        leg1.get_patches(), leg2.get_patches(),
+        leg1.get_patches(),
+        leg2.get_patches(),
     )
     assert_artists_equal(
-        leg1.get_lines(), leg2.get_lines(),
+        leg1.get_lines(),
+        leg2.get_lines(),
     )
 
 

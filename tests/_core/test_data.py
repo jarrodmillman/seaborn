@@ -13,7 +13,6 @@ assert_vector_equal = functools.partial(assert_series_equal, check_names=False)
 
 
 class TestPlotData:
-
     @pytest.fixture
     def long_variables(self):
         variables = dict(x="x", y="y", color="a", size="z", style="s_cat")
@@ -144,7 +143,8 @@ class TestPlotData:
             PlotData(long_df, {"x": "x", "y": vector})
 
     @pytest.mark.parametrize(
-        "arg", [{}, pd.DataFrame()],
+        "arg",
+        [{}, pd.DataFrame()],
     )
     def test_empty_data_input(self, arg):
 
@@ -350,8 +350,8 @@ class TestPlotData:
         p1 = PlotData(d1, v1)
         p2 = p1.join(d2, v2)
 
-        (var1, key1), = v1.items()
-        (var2, key2), = v2.items()
+        ((var1, key1),) = v1.items()
+        ((var2, key2),) = v2.items()
 
         assert_vector_equal(p2.frame.loc[d1.index, var1], d1[key1])
         assert_vector_equal(p2.frame.loc[d2.index, var2], d2[key2])
@@ -372,8 +372,8 @@ class TestPlotData:
         p1 = PlotData(d1, v1)
         p2 = p1.join(d2, v2)
 
-        (var1, key1), = v1.items()
-        (var2, key2), = v2.items()
+        ((var1, key1),) = v1.items()
+        ((var2, key2),) = v2.items()
 
         assert_vector_equal(p2.frame.loc[d2.index, var], d2[k2])
         assert p2.frame.loc[d1.index.difference(d2.index), var].isna().all()
@@ -406,7 +406,7 @@ class TestPlotData:
 
     @pytest.mark.skipif(
         condition=not hasattr(pd.api, "interchange"),
-        reason="Tests behavior assuming support for dataframe interchange"
+        reason="Tests behavior assuming support for dataframe interchange",
     )
     def test_data_interchange(self, mock_long_df, long_df):
 
@@ -427,7 +427,7 @@ class TestPlotData:
 
     @pytest.mark.skipif(
         condition=hasattr(pd.api, "interchange"),
-        reason="Tests graceful failure without support for dataframe interchange"
+        reason="Tests graceful failure without support for dataframe interchange",
     )
     def test_data_interchange_support_test(self, mock_long_df):
 

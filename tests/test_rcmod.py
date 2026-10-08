@@ -13,16 +13,18 @@ def has_verdana():
     # testing other tests in this module not requiring this knowledge,
     # import font_manager here
     import matplotlib.font_manager as mplfm
+
     try:
-        verdana_font = mplfm.findfont('Verdana', fallback_to_default=False)
+        verdana_font = mplfm.findfont("Verdana", fallback_to_default=False)
     except:  # noqa
         # if https://github.com/matplotlib/matplotlib/pull/3435
         # gets accepted
         return False
     # otherwise check if not matching the logic for a 'default' one
     try:
-        unlikely_font = mplfm.findfont("very_unlikely_to_exist1234",
-                                       fallback_to_default=False)
+        unlikely_font = mplfm.findfont(
+            "very_unlikely_to_exist1234", fallback_to_default=False
+        )
     except:  # noqa
         # if matched verdana but not unlikely, Verdana must exist
         return True
@@ -31,7 +33,6 @@ def has_verdana():
 
 
 class RCParamFixtures:
-
     @pytest.fixture(autouse=True)
     def reset_params(self):
         yield
@@ -71,7 +72,6 @@ class RCParamFixtures:
 
 
 class TestAxesStyle(RCParamFixtures):
-
     styles = ["white", "dark", "whitegrid", "darkgrid", "ticks"]
 
     def test_default_return(self):
@@ -100,7 +100,6 @@ class TestAxesStyle(RCParamFixtures):
     def test_set_style(self):
 
         for style in self.styles:
-
             style_dict = rcmod.axes_style(style)
             rcmod.set_style(style)
             self.assert_rc_params(style_dict)
@@ -118,6 +117,7 @@ class TestAxesStyle(RCParamFixtures):
         @rcmod.axes_style("whitegrid")
         def func():
             self.assert_rc_params(context_params)
+
         func()
         self.assert_rc_params(orig_params)
 
@@ -181,7 +181,6 @@ class TestAxesStyle(RCParamFixtures):
 
 
 class TestPlottingContext(RCParamFixtures):
-
     contexts = ["paper", "notebook", "talk", "poster"]
 
     def test_default_return(self):
@@ -208,9 +207,12 @@ class TestPlottingContext(RCParamFixtures):
 
         font_keys = [
             "font.size",
-            "axes.labelsize", "axes.titlesize",
-            "xtick.labelsize", "ytick.labelsize",
-            "legend.fontsize", "legend.title_fontsize",
+            "axes.labelsize",
+            "axes.titlesize",
+            "xtick.labelsize",
+            "ytick.labelsize",
+            "legend.fontsize",
+            "legend.title_fontsize",
         ]
 
         for k in font_keys:
@@ -227,7 +229,6 @@ class TestPlottingContext(RCParamFixtures):
     def test_set_context(self):
 
         for context in self.contexts:
-
             context_dict = rcmod.plotting_context(context)
             rcmod.set_context(context)
             self.assert_rc_params(context_dict)
@@ -245,12 +246,12 @@ class TestPlottingContext(RCParamFixtures):
         @rcmod.plotting_context("paper")
         def func():
             self.assert_rc_params(context_params)
+
         func()
         self.assert_rc_params(orig_params)
 
 
 class TestPalette(RCParamFixtures):
-
     def test_set_palette(self):
 
         rcmod.set_palette("deep")
@@ -271,7 +272,6 @@ class TestPalette(RCParamFixtures):
 
 
 class TestFonts(RCParamFixtures):
-
     _no_verdana = not has_verdana()
 
     @pytest.mark.skipif(_no_verdana, reason="Verdana font is not present")

@@ -33,7 +33,6 @@ def example_func():
 
 
 class TestDocstringComponents:
-
     def test_from_dict(self):
 
         obj = DocstringComponents(EXAMPLE_DICT)
@@ -52,7 +51,5 @@ class TestDocstringComponents:
 
     def test_from_method(self):
 
-        obj = DocstringComponents.from_function_params(
-            ExampleClass.example_method
-        )
+        obj = DocstringComponents.from_function_params(ExampleClass.example_method)
         assert obj.a == "a : str\n    A method parameter."

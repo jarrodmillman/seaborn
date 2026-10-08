@@ -24,15 +24,19 @@ The classes should behave roughly in the style of scikit-learn.
   class instantiation.
 
 """
+
 from numbers import Number
 from statistics import NormalDist
 import numpy as np
 import pandas as pd
+
 try:
     from scipy.stats import gaussian_kde
+
     _no_scipy = False
 except ImportError:
     from .external.kde import gaussian_kde
+
     _no_scipy = True
 
 from .algorithms import bootstrap
@@ -41,8 +45,10 @@ from .utils import _check_argument
 
 class KDE:
     """Univariate and bivariate kernel density estimator."""
+
     def __init__(
-        self, *,
+        self,
+        *,
         bw_method=None,
         bw_adjust=1,
         gridsize=200,
@@ -99,9 +105,7 @@ class KDE:
         """Create a 1D grid of evaluation points."""
         kde = self._fit(x, weights)
         bw = np.sqrt(kde.covariance.squeeze())
-        grid = self._define_support_grid(
-            x, bw, self.cut, self.clip, self.gridsize
-        )
+        grid = self._define_support_grid(x, bw, self.cut, self.clip, self.gridsize)
         return grid
 
     def _define_support_bivariate(self, x1, x2, weights):
@@ -113,12 +117,8 @@ class KDE:
         kde = self._fit([x1, x2], weights)
         bw = np.sqrt(np.diag(kde.covariance).squeeze())
 
-        grid1 = self._define_support_grid(
-            x1, bw[0], self.cut, clip[0], self.gridsize
-        )
-        grid2 = self._define_support_grid(
-            x2, bw[1], self.cut, clip[1], self.gridsize
-        )
+        grid1 = self._define_support_grid(x1, bw[0], self.cut, clip[0], self.gridsize)
+        grid2 = self._define_support_grid(x2, bw[1], self.cut, clip[1], self.gridsize)
 
         return grid1, grid2
 
@@ -155,9 +155,7 @@ class KDE:
 
         if self.cumulative:
             s_0 = support[0]
-            density = np.array([
-                kde.integrate_box_1d(s_0, s_i) for s_i in support
-            ])
+            density = np.array([kde.integrate_box_1d(s_0, s_i) for s_i in support])
         else:
             density = kde(support)
 
@@ -172,7 +170,6 @@ class KDE:
         kde = self._fit([x1, x2], weights)
 
         if self.cumulative:
-
             grid1, grid2 = support
             density = np.zeros((grid1.size, grid2.size))
             p0 = grid1.min(), grid2.min()
@@ -181,7 +178,6 @@ class KDE:
                     density[i, j] = kde.integrate_box(p0, (xi, xj))
 
         else:
-
             xx1, xx2 = np.meshgrid(*support)
             density = kde([xx1.ravel(), xx2.ravel()]).reshape(xx1.shape)
 
@@ -199,6 +195,7 @@ class KDE:
 # preferring _stats.Hist. We'll deprecate this once we have a bivariate Stat class.
 class Histogram:
     """Univariate and bivariate histogram estimator."""
+
     def __init__(
         self,
         stat="count",
@@ -239,7 +236,12 @@ class Histogram:
 
         """
         stat_choices = [
-            "count", "frequency", "density", "probability", "proportion", "percent",
+            "count",
+            "frequency",
+            "density",
+            "probability",
+            "proportion",
+            "percent",
         ]
         _check_argument("stat", stat_choices, stat)
 
@@ -260,7 +262,7 @@ class Histogram:
             start, stop = binrange
 
         if discrete:
-            bin_edges = np.arange(start - .5, stop + 1.5)
+            bin_edges = np.arange(start - 0.5, stop + 1.5)
         elif binwidth is not None:
             step = binwidth
             bin_edges = np.arange(start, stop + step, step)
@@ -269,16 +271,23 @@ class Histogram:
                 bin_edges = np.append(bin_edges, bin_edges.max() + step)
         else:
             bin_edges = np.histogram_bin_edges(
-                x, bins, binrange, weights,
+                x,
+                bins,
+                binrange,
+                weights,
             )
         return bin_edges
 
     def define_bin_params(self, x1, x2=None, weights=None, cache=True):
         """Given data, return numpy.histogram parameters to define bins."""
         if x2 is None:
-
             bin_edges = self._define_bin_edges(
-                x1, weights, self.bins, self.binwidth, self.binrange, self.discrete,
+                x1,
+                weights,
+                self.bins,
+                self.binwidth,
+                self.binrange,
+                self.discrete,
             )
 
             if isinstance(self.bins, (str, Number)):
@@ -289,10 +298,8 @@ class Histogram:
                 bin_kws = dict(bins=bin_edges)
 
         else:
-
             bin_edges = []
             for i, x in enumerate([x1, x2]):
-
                 # Resolve out whether bin parameters are shared
                 # or specific to each variable
 
@@ -322,9 +329,16 @@ class Histogram:
 
                 # Define the bins for this variable
 
-                bin_edges.append(self._define_bin_edges(
-                    x, weights, bins, binwidth, binrange, discrete,
-                ))
+                bin_edges.append(
+                    self._define_bin_edges(
+                        x,
+                        weights,
+                        bins,
+                        binwidth,
+                        binrange,
+                        discrete,
+                    )
+                )
 
             bin_kws = dict(bins=tuple(bin_edges))
 
@@ -373,7 +387,10 @@ class Histogram:
 
         density = self.stat == "density"
         hist, bin_edges = np.histogram(
-            x, **bin_kws, weights=weights, density=density,
+            x,
+            **bin_kws,
+            weights=weights,
+            density=density,
         )
 
         if self.stat == "probability" or self.stat == "proportion":
@@ -401,6 +418,7 @@ class Histogram:
 
 class ECDF:
     """Univariate empirical cumulative distribution estimator."""
+
     def __init__(self, stat="proportion", complementary=False):
         """Initialize the class with its parameters
 
@@ -455,7 +473,6 @@ class ECDF:
 
 
 class EstimateAggregator:
-
     def __init__(self, estimator, errorbar=None, **boot_kws):
         """
         Data aggregator that produces an estimate and error bar interval.
@@ -521,7 +538,6 @@ class EstimateAggregator:
 
 
 class WeightedAggregator:
-
     def __init__(self, estimator, errorbar=None, **boot_kws):
         """
         Data aggregator that produces a weighted estimate and error bar interval.
@@ -577,7 +593,6 @@ class WeightedAggregator:
 
 
 class LetterValues:
-
     def __init__(self, k_depth, outlier_prop, trust_alpha):
         """
         Compute percentiles of a distribution using various tail stopping rules.

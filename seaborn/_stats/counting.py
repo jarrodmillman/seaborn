@@ -11,6 +11,7 @@ from seaborn._core.scales import Scale
 from seaborn._stats.base import Stat
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
@@ -29,16 +30,20 @@ class Count(Stat):
     .. include:: ../docstrings/objects.Count.rst
 
     """
+
     group_by_orient: ClassVar[bool] = True
 
     def __call__(
-        self, data: DataFrame, groupby: GroupBy, orient: str, scales: dict[str, Scale],
+        self,
+        data: DataFrame,
+        groupby: GroupBy,
+        orient: str,
+        scales: dict[str, Scale],
     ) -> DataFrame:
 
         var = {"x": "y", "y": "x"}[orient]
         res = (
-            groupby
-            .agg(data.assign(**{var: data[orient]}), {var: len})
+            groupby.agg(data.assign(**{var: data[orient]}), {var: len})
             .dropna(subset=["x", "y"])
             .reset_index(drop=True)
         )
@@ -104,6 +109,7 @@ class Hist(Stat):
     .. include:: ../docstrings/objects.Hist.rst
 
     """
+
     stat: str = "count"
     bins: str | int | ArrayLike = "auto"
     binwidth: float | None = None
@@ -116,7 +122,12 @@ class Hist(Stat):
     def __post_init__(self):
 
         stat_options = [
-            "count", "density", "percent", "probability", "proportion", "frequency"
+            "count",
+            "density",
+            "percent",
+            "probability",
+            "proportion",
+            "frequency",
         ]
         self._check_param_one_of("stat", stat_options)
 
@@ -130,7 +141,7 @@ class Hist(Stat):
             start, stop = binrange
 
         if discrete:
-            bin_edges = np.arange(start - .5, stop + 1.5)
+            bin_edges = np.arange(start - 0.5, stop + 1.5)
         else:
             if binwidth is not None:
                 bins = int(round((stop - start) / binwidth))
@@ -150,7 +161,12 @@ class Hist(Stat):
         discrete = self.discrete or scale_type == "nominal"
 
         bin_edges = self._define_bin_edges(
-            vals, weights, self.bins, self.binwidth, self.binrange, discrete,
+            vals,
+            weights,
+            self.bins,
+            self.binwidth,
+            self.binrange,
+            discrete,
         )
 
         if isinstance(self.bins, (str, int)):
@@ -199,7 +215,11 @@ class Hist(Stat):
         return data.assign(**{self.stat: hist})
 
     def __call__(
-        self, data: DataFrame, groupby: GroupBy, orient: str, scales: dict[str, Scale],
+        self,
+        data: DataFrame,
+        groupby: GroupBy,
+        orient: str,
+        scales: dict[str, Scale],
     ) -> DataFrame:
 
         scale_type = scales[orient].__class__.__name__.lower()
@@ -215,7 +235,11 @@ class Hist(Stat):
                 self._check_grouping_vars("common_bins", grouping_vars)
 
             data = bin_groupby.apply(
-                data, self._get_bins_and_eval, orient, groupby, scale_type,
+                data,
+                self._get_bins_and_eval,
+                orient,
+                groupby,
+                scale_type,
             )
 
         if not grouping_vars or self.common_norm is True:

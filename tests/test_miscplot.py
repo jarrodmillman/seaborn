@@ -7,6 +7,7 @@ from .test_utils import _network
 
 class TestPalPlot:
     """Test the function that visualizes a color palette."""
+
     def test_palplot_size(self):
 
         pal4 = color_palette("husl", 4)
@@ -26,7 +27,6 @@ class TestPalPlot:
 
 
 class TestDogPlot:
-
     @_network(url="https://github.com/mwaskom/seaborn-data")
     def test_dogplot(self):
         misc.dogplot()

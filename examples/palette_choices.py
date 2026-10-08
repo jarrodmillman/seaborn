@@ -3,9 +3,11 @@ Color palette choices
 =====================
 
 """
+
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 sns.set_theme(style="white", context="talk")
 rs = np.random.RandomState(8)
 

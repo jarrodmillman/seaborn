@@ -29,6 +29,7 @@ class Text(Mark):
     .. include:: ../docstrings/objects.Text.rst
 
     """
+
     text: MappableString = Mappable("")
     color: MappableColor = Mappable("k")
     alpha: MappableFloat = Mappable(1)
@@ -42,7 +43,6 @@ class Text(Mark):
         ax_data = defaultdict(list)
 
         for keys, data, ax in split_gen():
-
             vals = resolve_properties(self, keys, scales)
             color = resolve_color(self, keys, "", scales)
 

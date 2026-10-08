@@ -5,9 +5,11 @@ Lineplot from a wide-form dataset
 _thumb: .52, .5
 
 """
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
+
 sns.set_theme(style="whitegrid")
 
 rs = np.random.RandomState(365)

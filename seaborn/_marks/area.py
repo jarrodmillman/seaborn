@@ -19,13 +19,11 @@ from seaborn._marks.base import (
 
 
 class AreaBase:
-
     def _plot(self, split_gen, scales, orient):
 
         patches = defaultdict(list)
 
         for keys, data, ax in split_gen():
-
             kws = {}
             data = self._standardize_coordinate_parameters(data, orient)
             resolved = resolve_properties(self, keys, scales)
@@ -45,7 +43,6 @@ class AreaBase:
             patches[ax].append(mpl.patches.Polygon(verts, **kws))
 
         for ax, ax_patches in patches.items():
-
             for patch in ax_patches:
                 self._postprocess_artist(patch, ax, orient)
                 ax.add_patch(patch)
@@ -60,10 +57,12 @@ class AreaBase:
 
         dv = {"x": "y", "y": "x"}[orient]
         data = data.sort_values(orient, kind="mergesort")
-        verts = np.concatenate([
-            data[[orient, f"{dv}min"]].to_numpy(),
-            data[[orient, f"{dv}max"]].to_numpy()[::-1],
-        ])
+        verts = np.concatenate(
+            [
+                data[[orient, f"{dv}min"]].to_numpy(),
+                data[[orient, f"{dv}max"]].to_numpy()[::-1],
+            ]
+        )
         if orient == "y":
             verts = verts[:, ::-1]
         return verts
@@ -101,13 +100,26 @@ class Area(AreaBase, Mark):
     .. include:: ../docstrings/objects.Area.rst
 
     """
-    color: MappableColor = Mappable("C0", )
-    alpha: MappableFloat = Mappable(.2, )
-    fill: MappableBool = Mappable(True, )
+
+    color: MappableColor = Mappable(
+        "C0",
+    )
+    alpha: MappableFloat = Mappable(
+        0.2,
+    )
+    fill: MappableBool = Mappable(
+        True,
+    )
     edgecolor: MappableColor = Mappable(depend="color")
-    edgealpha: MappableFloat = Mappable(1, )
-    edgewidth: MappableFloat = Mappable(rc="patch.linewidth", )
-    edgestyle: MappableStyle = Mappable("-", )
+    edgealpha: MappableFloat = Mappable(
+        1,
+    )
+    edgewidth: MappableFloat = Mappable(
+        rc="patch.linewidth",
+    )
+    edgestyle: MappableStyle = Mappable(
+        "-",
+    )
 
     # TODO should this be settable / mappable?
     baseline: MappableFloat = Mappable(0, grouping=False)
@@ -151,13 +163,28 @@ class Band(AreaBase, Mark):
     .. include:: ../docstrings/objects.Band.rst
 
     """
-    color: MappableColor = Mappable("C0", )
-    alpha: MappableFloat = Mappable(.2, )
-    fill: MappableBool = Mappable(True, )
-    edgecolor: MappableColor = Mappable(depend="color", )
-    edgealpha: MappableFloat = Mappable(1, )
-    edgewidth: MappableFloat = Mappable(0, )
-    edgestyle: MappableFloat = Mappable("-", )
+
+    color: MappableColor = Mappable(
+        "C0",
+    )
+    alpha: MappableFloat = Mappable(
+        0.2,
+    )
+    fill: MappableBool = Mappable(
+        True,
+    )
+    edgecolor: MappableColor = Mappable(
+        depend="color",
+    )
+    edgealpha: MappableFloat = Mappable(
+        1,
+    )
+    edgewidth: MappableFloat = Mappable(
+        0,
+    )
+    edgestyle: MappableFloat = Mappable(
+        "-",
+    )
 
     def _standardize_coordinate_parameters(self, data, orient):
         # dv = {"x": "y", "y": "x"}[orient]

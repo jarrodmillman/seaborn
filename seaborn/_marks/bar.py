@@ -14,10 +14,11 @@ from seaborn._marks.base import (
     MappableStyle,
     resolve_properties,
     resolve_color,
-    document_properties
+    document_properties,
 )
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from typing import Any
     from matplotlib.artist import Artist
@@ -25,7 +26,6 @@ if TYPE_CHECKING:
 
 
 class BarBase(Mark):
-
     def _make_patches(self, data, scales, orient):
 
         transform = scales[orient]._matplotlib_scale.get_transform()
@@ -53,7 +53,6 @@ class BarBase(Mark):
         bars, vals = [], []
 
         for i in range(len(data)):
-
             row = {k: v[i] for k, v in kws.items()}
 
             # Skip bars with no value. It's possible we'll want to make this
@@ -94,7 +93,10 @@ class BarBase(Mark):
         return resolved
 
     def _legend_artist(
-        self, variables: list[str], value: Any, scales: dict[str, Scale],
+        self,
+        variables: list[str],
+        value: Any,
+        scales: dict[str, Scale],
     ) -> Artist:
         # TODO return some sensible default?
         key = {v: value for v in variables}
@@ -123,8 +125,9 @@ class Bar(BarBase):
     .. include:: ../docstrings/objects.Bar.rst
 
     """
+
     color: MappableColor = Mappable("C0", grouping=False)
-    alpha: MappableFloat = Mappable(.7, grouping=False)
+    alpha: MappableFloat = Mappable(0.7, grouping=False)
     fill: MappableBool = Mappable(True, grouping=False)
     edgecolor: MappableColor = Mappable(depend="color", grouping=False)
     edgealpha: MappableFloat = Mappable(1, grouping=False)
@@ -132,7 +135,7 @@ class Bar(BarBase):
     edgestyle: MappableStyle = Mappable("-", grouping=False)
     # pattern: MappableString = Mappable(None)  # TODO no Property yet
 
-    width: MappableFloat = Mappable(.8, grouping=False)
+    width: MappableFloat = Mappable(0.8, grouping=False)
     baseline: MappableFloat = Mappable(0, grouping=False)  # TODO *is* this mappable?
 
     def _plot(self, split_gen, scales, orient):
@@ -140,11 +143,9 @@ class Bar(BarBase):
         val_idx = ["y", "x"].index(orient)
 
         for _, data, ax in split_gen():
-
             bars, vals = self._make_patches(data, scales, orient)
 
             for bar in bars:
-
                 # Because we are clipping the artist (see below), the edges end up
                 # looking half as wide as they actually are. I don't love this clumsy
                 # workaround, which is going to cause surprises if you work with the
@@ -190,8 +191,9 @@ class Bars(BarBase):
     .. include:: ../docstrings/objects.Bars.rst
 
     """
+
     color: MappableColor = Mappable("C0", grouping=False)
-    alpha: MappableFloat = Mappable(.7, grouping=False)
+    alpha: MappableFloat = Mappable(0.7, grouping=False)
     fill: MappableBool = Mappable(True, grouping=False)
     edgecolor: MappableColor = Mappable(rc="patch.edgecolor", grouping=False)
     edgealpha: MappableFloat = Mappable(1, grouping=False)
@@ -214,7 +216,6 @@ class Bars(BarBase):
 
         collections = {}
         for ax, ax_patches in patches.items():
-
             col = mpl.collections.PatchCollection(ax_patches, match_original=True)
             col.sticky_edges[val_idx][:] = (0, np.inf)
             ax.add_collection(col, autolim=False)
@@ -227,7 +228,6 @@ class Bars(BarBase):
             ax.update_datalim(xys)
 
         if "edgewidth" not in scales and isinstance(self.edgewidth, Mappable):
-
             for ax in collections:
                 ax.autoscale_view()
 
@@ -241,12 +241,16 @@ class Bars(BarBase):
             min_width = np.inf
             for ax, col in collections.items():
                 edges, widths = get_dimensions(col)
-                points = 72 / ax.figure.dpi * abs(
-                    ax.transData.transform([edges + widths] * 2)
-                    - ax.transData.transform([edges] * 2)
+                points = (
+                    72
+                    / ax.figure.dpi
+                    * abs(
+                        ax.transData.transform([edges + widths] * 2)
+                        - ax.transData.transform([edges] * 2)
+                    )
                 )
                 min_width = min(min_width, min(points[:, ori_idx]))
 
-            linewidth = min(.1 * min_width, mpl.rcParams["patch.linewidth"])
+            linewidth = min(0.1 * min_width, mpl.rcParams["patch.linewidth"])
             for _, col in collections.items():
                 col.set_linewidth(linewidth)

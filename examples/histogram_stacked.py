@@ -5,6 +5,7 @@ Stacked histogram on a log scale
 _thumb: .5, .45
 
 """
+
 import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -18,11 +19,12 @@ sns.despine(f)
 
 sns.histplot(
     diamonds,
-    x="price", hue="cut",
+    x="price",
+    hue="cut",
     multiple="stack",
     palette="light:m_r",
     edgecolor=".3",
-    linewidth=.5,
+    linewidth=0.5,
     log_scale=True,
 )
 ax.xaxis.set_major_formatter(mpl.ticker.ScalarFormatter())

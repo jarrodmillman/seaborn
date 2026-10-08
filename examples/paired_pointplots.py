@@ -3,16 +3,22 @@ Paired categorical plots
 ========================
 
 """
+
 import seaborn as sns
+
 sns.set_theme(style="whitegrid")
 
 # Load the example Titanic dataset
 titanic = sns.load_dataset("titanic")
 
 # Set up a grid to plot survival probability against several variables
-g = sns.PairGrid(titanic, y_vars="survived",
-                 x_vars=["class", "sex", "who", "alone"],
-                 height=5, aspect=.5)
+g = sns.PairGrid(
+    titanic,
+    y_vars="survived",
+    x_vars=["class", "sex", "who", "alone"],
+    height=5,
+    aspect=0.5,
+)
 
 # Draw a seaborn pointplot onto each Axes
 g.map(sns.pointplot, color="xkcd:plum")

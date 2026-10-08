@@ -26,6 +26,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
+
 import os
 import sys
 import nbformat
@@ -33,7 +34,7 @@ from nbconvert import RSTExporter
 from nbconvert.preprocessors import (
     ExecutePreprocessor,
     TagRemovePreprocessor,
-    ExtractOutputPreprocessor
+    ExtractOutputPreprocessor,
 )
 from traitlets.config import Config
 
@@ -50,14 +51,14 @@ def pop_recursive(d, key, default=None):
     >>> d
     {'a': {'b': 1}}
     """
-    nested = key.split('.')
+    nested = key.split(".")
     current = d
     for k in nested[:-1]:
-        if hasattr(current, 'get'):
+        if hasattr(current, "get"):
             current = current.get(k, {})
         else:
             return default
-    if not hasattr(current, 'pop'):
+    if not hasattr(current, "pop"):
         return default
     return current.pop(nested[-1], default)
 
@@ -68,35 +69,34 @@ def strip_output(nb):
     metadata from a notebook object, unless specified to keep either the
     outputs or counts.
     """
-    keys = {'metadata': [], 'cell': {'metadata': ["execution"]}}
+    keys = {"metadata": [], "cell": {"metadata": ["execution"]}}
 
-    nb.metadata.pop('signature', None)
-    nb.metadata.pop('widgets', None)
+    nb.metadata.pop("signature", None)
+    nb.metadata.pop("widgets", None)
 
-    for field in keys['metadata']:
+    for field in keys["metadata"]:
         pop_recursive(nb.metadata, field)
 
-    if 'NB_KERNEL' in os.environ:
-        nb.metadata['kernelspec']['name'] = os.environ['NB_KERNEL']
-        nb.metadata['kernelspec']['display_name'] = os.environ['NB_KERNEL']
+    if "NB_KERNEL" in os.environ:
+        nb.metadata["kernelspec"]["name"] = os.environ["NB_KERNEL"]
+        nb.metadata["kernelspec"]["display_name"] = os.environ["NB_KERNEL"]
 
     for cell in nb.cells:
-
-        if 'outputs' in cell:
-            cell['outputs'] = []
-        if 'prompt_number' in cell:
-            cell['prompt_number'] = None
-        if 'execution_count' in cell:
-            cell['execution_count'] = None
+        if "outputs" in cell:
+            cell["outputs"] = []
+        if "prompt_number" in cell:
+            cell["prompt_number"] = None
+        if "execution_count" in cell:
+            cell["execution_count"] = None
 
         # Always remove this metadata
-        for output_style in ['collapsed', 'scrolled']:
+        for output_style in ["collapsed", "scrolled"]:
             if output_style in cell.metadata:
                 cell.metadata[output_style] = False
-        if 'metadata' in cell:
-            for field in ['collapsed', 'scrolled', 'ExecuteTime']:
+        if "metadata" in cell:
+            for field in ["collapsed", "scrolled", "ExecuteTime"]:
                 cell.metadata.pop(field, None)
-        for (extra, fields) in keys['cell'].items():
+        for extra, fields in keys["cell"].items():
             if extra in cell:
                 for field in fields:
                     pop_recursive(getattr(cell, extra), field)
@@ -104,7 +104,6 @@ def strip_output(nb):
 
 
 if __name__ == "__main__":
-
     # Get the desired ipynb file path and parse into components
     _, fpath, outdir = sys.argv
     basedir, fname = os.path.split(fpath)
@@ -125,7 +124,7 @@ if __name__ == "__main__":
             "--InlineBackend.rc=figure.dpi=88",
             # Silence ipykernel's "running over TCP without encryption" warning
             "--IPKernelApp.log_level=ERROR",
-        ]
+        ],
     )
     ep.preprocess(nb, {"metadata": {"path": basedir}})
 
@@ -150,8 +149,9 @@ if __name__ == "__main__":
     c.TagRemovePreprocessor.remove_cell_tags = {"hide"}
     c.TagRemovePreprocessor.remove_input_tags = {"hide-input"}
     c.TagRemovePreprocessor.remove_all_outputs_tags = {"hide-output"}
-    c.ExtractOutputPreprocessor.output_filename_template = \
+    c.ExtractOutputPreprocessor.output_filename_template = (
         f"{fstem}_files/{fstem}_" + "{cell_index}_{index}{extension}"
+    )
 
     exp.register_preprocessor(TagRemovePreprocessor(config=c), True)
     exp.register_preprocessor(ExtractOutputPreprocessor(config=c), True)

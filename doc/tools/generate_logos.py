@@ -30,7 +30,6 @@ def poisson_disc_sample(array_radius, pad_radius, candidates=100, d=2, seed=None
     queue = [start]
 
     while queue:
-
         # Pick a sample to expand from
         s_idx = randint(len(queue))
         s = queue[s_idx]
@@ -40,7 +39,7 @@ def poisson_disc_sample(array_radius, pad_radius, candidates=100, d=2, seed=None
             coords = uniform(s - 2 * pad_radius, s + 2 * pad_radius, d)
 
             # Check the three conditions to accept the candidate
-            in_array = np.sqrt(np.sum(coords ** 2)) < array_radius
+            in_array = np.sqrt(np.sum(coords**2)) < array_radius
             in_ring = np.all(distance.cdist(samples, [coords]) > pad_radius)
 
             if in_array and in_ring:
@@ -60,16 +59,30 @@ def poisson_disc_sample(array_radius, pad_radius, candidates=100, d=2, seed=None
 
 def logo(
     ax,
-    color_kws, ring, ring_idx, edge,
-    pdf_means, pdf_sigma, dy, y0, w, h,
-    hist_mean, hist_sigma, hist_y0, lw, skip,
-    scatter, pad, scale,
+    color_kws,
+    ring,
+    ring_idx,
+    edge,
+    pdf_means,
+    pdf_sigma,
+    dy,
+    y0,
+    w,
+    h,
+    hist_mean,
+    hist_sigma,
+    hist_y0,
+    lw,
+    skip,
+    scatter,
+    pad,
+    scale,
 ):
 
     # Square, invisible axes with specified limits to center the logo
     ax.set(xlim=(35 + w, 95 - w), ylim=(-3, 53))
     ax.set_axis_off()
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
 
     # Magic numbers for the logo circle
     radius = 27
@@ -88,7 +101,7 @@ def logo(
     dys -= dys.mean()
 
     # Compute the PDF curves with vertical offsets
-    pdfs = [h * (y[x0 - m:-m] + y0 + dy) for m, dy in zip(pdf_means, dys)]
+    pdfs = [h * (y[x0 - m : -m] + y0 + dy) for m, dy in zip(pdf_means, dys)]
 
     # Add in constants to fill from bottom and to top
     pdfs.insert(0, np.full(xx.shape, -h))
@@ -99,8 +112,11 @@ def logo(
 
     # White fill between curves and around edges
     bg = patches.Circle(
-        center, radius=radius - 1 + ring, color="white",
-        transform=ax.transData, zorder=0,
+        center,
+        radius=radius - 1 + ring,
+        color="white",
+        transform=ax.transData,
+        zorder=0,
     )
     ax.add_artist(bg)
 
@@ -110,8 +126,14 @@ def logo(
     # Ring artist to surround the circle (optional)
     if ring:
         wedge = patches.Wedge(
-            center, r=radius + edge / 2, theta1=0, theta2=360, width=edge / 2,
-            transform=ax.transData, color=colors[ring_idx], alpha=1
+            center,
+            r=radius + edge / 2,
+            theta1=0,
+            theta2=360,
+            width=edge / 2,
+            transform=ax.transData,
+            color=colors[ring_idx],
+            alpha=1,
         )
         ax.add_artist(wedge)
 
@@ -119,15 +141,21 @@ def logo(
     if hist_mean:
         hist_color = colors.pop(0)
         hist_y = gaussian(x.size, hist_sigma)
-        hist = 1.1 * h * (hist_y[x0 - hist_mean:-hist_mean] + hist_y0)
+        hist = 1.1 * h * (hist_y[x0 - hist_mean : -hist_mean] + hist_y0)
         dx = x[skip] - x[0]
         hist_x = xx[::skip]
         hist_h = h + hist[::skip]
         # Magic number to avoid tiny sliver of bar on edge
-        use = hist_x < center[0] + radius * .5
+        use = hist_x < center[0] + radius * 0.5
         bars = ax.bar(
-            hist_x[use], hist_h[use], bottom=-h, width=dx,
-            align="edge", color=hist_color, ec="w", lw=lw,
+            hist_x[use],
+            hist_h[use],
+            bottom=-h,
+            width=dx,
+            align="edge",
+            color=hist_color,
+            ec="w",
+            lw=lw,
             zorder=3,
         )
         for bar in bars:
@@ -148,8 +176,13 @@ def logo(
         sizes = (x - y) % 9
 
         points = ax.scatter(
-            x + center[0], y + center[1], s=scale * (10 + sizes * 5),
-            zorder=5, color=colors[-1], ec="w", lw=scale / 2,
+            x + center[0],
+            y + center[1],
+            s=scale * (10 + sizes * 5),
+            zorder=5,
+            color=colors[-1],
+            ec="w",
+            lw=scale / 2,
         )
         path = u.get_paths()[0]
         points.set_clip_path(path, transform=u.get_transform())
@@ -167,18 +200,28 @@ def savefig(fig, shape, variant):
 
 
 if __name__ == "__main__":
-
     for bg in ["white", "light", "dark"]:
-
         color_idx = -1 if bg == "dark" else 0
 
         kwargs = dict(
-            color_kws=dict(start=.3, rot=-.4, light=.8, dark=.3, reverse=True),
-            ring=True, ring_idx=color_idx, edge=1,
-            pdf_means=[8, 24], pdf_sigma=16,
-            dy=1, y0=1.8, w=.5, h=12,
-            hist_mean=2, hist_sigma=10, hist_y0=.6, lw=1, skip=6,
-            scatter=True, pad=1.8, scale=.5,
+            color_kws=dict(start=0.3, rot=-0.4, light=0.8, dark=0.3, reverse=True),
+            ring=True,
+            ring_idx=color_idx,
+            edge=1,
+            pdf_means=[8, 24],
+            pdf_sigma=16,
+            dy=1,
+            y0=1.8,
+            w=0.5,
+            h=12,
+            hist_mean=2,
+            hist_sigma=10,
+            hist_y0=0.6,
+            lw=1,
+            skip=6,
+            scatter=True,
+            pad=1.8,
+            scale=0.5,
         )
         color = sns.cubehelix_palette(**kwargs["color_kws"])[color_idx]
 
@@ -190,8 +233,9 @@ if __name__ == "__main__":
 
         # ------------------------------------------------------------------------ #
 
-        fig, axs = plt.subplots(1, 2, figsize=(8, 2), dpi=100,
-                                gridspec_kw=dict(width_ratios=[1, 3]))
+        fig, axs = plt.subplots(
+            1, 2, figsize=(8, 2), dpi=100, gridspec_kw=dict(width_ratios=[1, 3])
+        )
         logo(axs[0], **kwargs)
 
         font = {
@@ -200,15 +244,23 @@ if __name__ == "__main__":
             "weight": "regular",
             "size": 120,
         }
-        axs[1].text(.01, .35, "seaborn", ha="left", va="center",
-                    fontdict=font, transform=axs[1].transAxes)
+        axs[1].text(
+            0.01,
+            0.35,
+            "seaborn",
+            ha="left",
+            va="center",
+            fontdict=font,
+            transform=axs[1].transAxes,
+        )
         axs[1].set_axis_off()
         savefig(fig, "wide", bg)
 
         # ------------------------------------------------------------------------ #
 
-        fig, axs = plt.subplots(2, 1, figsize=(2, 2.5), dpi=100,
-                                gridspec_kw=dict(height_ratios=[4, 1]))
+        fig, axs = plt.subplots(
+            2, 1, figsize=(2, 2.5), dpi=100, gridspec_kw=dict(height_ratios=[4, 1])
+        )
 
         logo(axs[0], **kwargs)
 
@@ -218,7 +270,14 @@ if __name__ == "__main__":
             "weight": "regular",
             "size": 34,
         }
-        axs[1].text(.5, 1, "seaborn", ha="center", va="top",
-                    fontdict=font, transform=axs[1].transAxes)
+        axs[1].text(
+            0.5,
+            1,
+            "seaborn",
+            ha="center",
+            va="top",
+            fontdict=font,
+            transform=axs[1].transAxes,
+        )
         axs[1].set_axis_off()
         savefig(fig, "tall", bg)

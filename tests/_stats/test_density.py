@@ -10,17 +10,18 @@ from seaborn._compat import groupby_apply_include_groups
 
 
 class TestKDE:
-
     @pytest.fixture
     def df(self, rng):
 
         n = 100
-        return pd.DataFrame(dict(
-            x=rng.uniform(0, 7, n).round(),
-            y=rng.normal(size=n),
-            color=rng.choice(["a", "b", "c"], n),
-            alpha=rng.choice(["x", "y"], n),
-        ))
+        return pd.DataFrame(
+            dict(
+                x=rng.uniform(0, 7, n).round(),
+                y=rng.normal(size=n),
+                color=rng.choice(["a", "b", "c"], n),
+                alpha=rng.choice(["x", "y"], n),
+            )
+        )
 
     def get_groupby(self, df, orient):
 
@@ -92,12 +93,9 @@ class TestKDE:
         gb = self.get_groupby(df, ori)
         res = KDE(common_norm=common_norm)(df, gb, ori, {})
 
-        areas = (
-            res.groupby("alpha")
-            .apply(
-                lambda x: self.integrate(x["density"], x[ori]),
-                **groupby_apply_include_groups(False),
-            )
+        areas = res.groupby("alpha").apply(
+            lambda x: self.integrate(x["density"], x[ori]),
+            **groupby_apply_include_groups(False),
         )
 
         if common_norm:
@@ -117,15 +115,13 @@ class TestKDE:
                 x.groupby("color")
                 .apply(
                     lambda y: self.integrate(y["density"], y[ori]),
-                    **groupby_apply_include_groups(False)
+                    **groupby_apply_include_groups(False),
                 )
                 .sum()
             )
 
-        areas = (
-            res
-            .groupby("alpha")
-            .apply(integrate_by_color_and_sum, **groupby_apply_include_groups(False))
+        areas = res.groupby("alpha").apply(
+            integrate_by_color_and_sum, **groupby_apply_include_groups(False)
         )
         assert_array_almost_equal(areas, [1, 1], decimal=3)
 

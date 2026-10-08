@@ -4,6 +4,7 @@ Horizontal, unfilled violinplots
 
 _thumb: .5, .45
 """
+
 import seaborn as sns
 
 sns.set_theme()
